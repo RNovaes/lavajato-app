@@ -14,8 +14,13 @@ export default function Cadastro() {
 
     const initialRef: any = null;
     const nomeInputRef = useRef(initialRef);
+    const emailnputRef = useRef(initialRef);
+    const senhaInputRef = useRef(initialRef);
     const cnpjInputRef = useRef(initialRef);
     const cpfInputRef = useRef(initialRef);
+    const nomeEmpresaInputRef = useRef(initialRef);
+    const emailEmpresaInputRef = useRef(initialRef);
+    const senhaEmpresaInputRef = useRef(initialRef);
 
     const toggleCnpj = () => {
         setTemCnpj(!temCnpj);
@@ -77,6 +82,7 @@ export default function Cadastro() {
         if (nome == '' || nome.length < 3 || nome.length > 50) {
             Vibration.vibrate()
             setmensagemErroNome("Preencha o Campo Nome Corretamente")
+            nomeInputRef.current.focus();
             error = true
         }
 
@@ -84,11 +90,13 @@ export default function Cadastro() {
         if (!re.test(String(email).toLowerCase())) {
             Vibration.vibrate()
             setmensagemErroEmail("Preencha o Campo E-mail Corretamente")
+            emailnputRef.current.focus();
             error = true
         }
         if (senha == '' || senha.length < 6) {
             Vibration.vibrate()
             setmensagemErroSenha("Mínimo de 6 Caracteres")
+            senhaInputRef.current.focus();
             error = true
         }
         if (senha.length > 18) {
@@ -111,6 +119,7 @@ export default function Cadastro() {
         if (nomeEmpresa == '' || nomeEmpresa.length < 3 || nomeEmpresa.length > 100) {
             Vibration.vibrate()
             setmensagemErronomeEmpresa("Preencha o Campo Nome Corretamente")
+            nomeEmpresaInputRef.current.focus();
             error = true
         }
 
@@ -137,11 +146,13 @@ export default function Cadastro() {
         if (!regE.test(String(emailEmpresa).toLowerCase())) {
             Vibration.vibrate()
             setmensagemErroEmailEmpresa("Preencha o Campo E-mail Corretamente")
+            emailEmpresaInputRef.current.focus();
             error = true
         }
         if (senhaEmpresa == '' || senhaEmpresa.length < 6) {
             Vibration.vibrate()
             setmensagemErroSenhaEmpresa("Mínimo de 6 Caracteres")
+            senhaEmpresaInputRef.current.focus();
             error = true
         }
         if (senhaEmpresa.length > 18) {
@@ -226,6 +237,7 @@ export default function Cadastro() {
 
                     {mensagemErroEmail && <Text style={cadastroStyle.mensagemErro}>{mensagemErroEmail}</Text>}
                     <MeuTextInput
+                        ref={emailnputRef}
                         label="Email"
                         style={cadastroStyle.input}
                         maxLength={50}
@@ -239,6 +251,7 @@ export default function Cadastro() {
                     {mensagemErroSenha && <Text style={cadastroStyle.mensagemErro}>{mensagemErroSenha}</Text>}
                     <View>
                         <MeuTextInput
+                            ref={senhaInputRef}
                             label="Senha"
                             secureTextEntry={esconderSenha}
                             style={cadastroStyle.input}
@@ -308,6 +321,7 @@ export default function Cadastro() {
 
                     {mensagemErronomeEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErronomeEmpresa}</Text>}
                     <MeuTextInput
+                        ref={nomeEmpresaInputRef}
                         label="Nome do Estabelecimento"
                         style={cadastroStyle.input}
                         maxLength={100}
@@ -320,6 +334,7 @@ export default function Cadastro() {
 
                     {mensagemErroEmailEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErroEmailEmpresa}</Text>}
                     <MeuTextInput
+                        ref={emailEmpresaInputRef}
                         label="Email"
                         style={cadastroStyle.input}
                         maxLength={50}
@@ -330,9 +345,10 @@ export default function Cadastro() {
                         }}
                     />
 
+                    {mensagemErroSenhaEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErroSenhaEmpresa}</Text>}
                     <View>
-                        {mensagemErroSenhaEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErroSenhaEmpresa}</Text>}
                         <MeuTextInput
+                            ref={senhaEmpresaInputRef}
                             label="Senha"
                             secureTextEntry={esconderSenha}
                             style={cadastroStyle.input}

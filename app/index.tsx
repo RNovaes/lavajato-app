@@ -1,18 +1,17 @@
 
-import { View, Text, TouchableOpacity, Vibration } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { ActivityIndicator } from "react-native/Libraries/Components/ActivityIndicator/ActivityIndicator";
-import React, { useState, useRef } from 'react';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import paginaInicialStyle from './estilos/paginaInicial';
-import { useFocusEffect } from '@react-navigation/native';
 import MeuTextInput from '@/components/MeuTextInput';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+import React, { useRef, useState } from 'react';
+import { Text, TouchableOpacity, Vibration, View } from 'react-native';
+import paginaInicialStyle from './estilos/paginaInicial';
 
 export default function paginaInicial() {
 
     const initialRef: any = null;
     const emailInputRef = useRef(initialRef);
+    const senhaInputRef = useRef(initialRef);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -27,8 +26,8 @@ export default function paginaInicial() {
     const router = useRouter()
 
     const [esconderSenha, setMostrarSenha] = useState(true)
-    const [email, setEmail] = useState('')
-    const [senha, setSenha] = useState('')
+    const [email, setEmail] = useState('re@g.com')
+    const [senha, setSenha] = useState('1111111')
 
     const [mensagemDeErroEmail, setmensagemDeErroEmail] = useState('');
     const [mensagemDeErroSenha, setmensagemDeErroSenha] = useState('');
@@ -41,6 +40,7 @@ export default function paginaInicial() {
         if (!re.test(String(email).toLowerCase())) {
             Vibration.vibrate()
             setmensagemDeErroEmail("Por favor, preencher o campo e-mail corretamente")
+            emailInputRef.current.focus();
             error = true
         }
 
@@ -53,6 +53,7 @@ export default function paginaInicial() {
         if (senha == null || senha.length < 6) {
             Vibration.vibrate()
             setmensagemDeErroSenha("Por favor, preencher o campo senha (Mínimo de 6 caracteres)")
+            senhaInputRef.current.focus();
             error = true
         }
         return !error
@@ -61,13 +62,16 @@ export default function paginaInicial() {
 
     const fazerLogin = async () => {
         if (validarCampos()) {
-            router.replace("/(tabs)")
+            let tipo = 1
+            if (tipo == 1) {
+                router.replace("/empresa")
+            }else{
+                router.replace("/cliente")
+            }
         }
     }
 
-    const irCadastro = () => {
-        router.replace("/cadastro")
-    }
+    //Aqui vou fazer o login com token
 
     return (
 
@@ -97,6 +101,7 @@ export default function paginaInicial() {
                 <MeuTextInput
                     label="Senha"
                     style={paginaInicialStyle.input}
+                    ref={senhaInputRef}
                     secureTextEntry={esconderSenha}
                     maxLength={18}
                     onChangeText={value => {
@@ -127,7 +132,7 @@ export default function paginaInicial() {
                 <View style={paginaInicialStyle.separar} />
             </View>
 
-            <TouchableOpacity style={paginaInicialStyle.botaoPrimario} onPress={() => irCadastro()}>
+            <TouchableOpacity style={paginaInicialStyle.botaoPrimario} onPress={() => router.replace("/cadastro")}>
                 <Text style={paginaInicialStyle.textoBotaoPrimario}>CADASTRAR-SE</Text>
             </TouchableOpacity>
 
