@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CurrencyInput from 'react-native-currency-input';
 import { Chip } from 'react-native-paper';
 import { useRouter } from 'expo-router'
+import Constants from 'expo-constants';
 
 const BG = '#FFFFFF';
 
@@ -95,7 +96,9 @@ export default function AtualizarDadosEmpresa() {
         }
     }
 
-    Geocoder.init('AIzaSyBlqY_dM9G3bbIV25dN0tQTBCvNOj76UYo');
+    const GOOGLE_API_KEY = Constants.expoConfig?.extra?.googleApiKey;
+
+    Geocoder.init(GOOGLE_API_KEY);
 
     const obterLocalizacao = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
