@@ -27,9 +27,9 @@ export default function RootLayout() {
           <Stack.Screen name="empresa" options={{ headerShown: false }} />
           <Stack.Screen name="cliente" options={{ headerShown: false }} />
           <Stack.Screen name="mapa/index" options={{
-            title: 'Lava-jatos próximos',
-            headerStyle: { backgroundColor: '#FFFFFF' },
-            headerTitleStyle: { color: '#111827', fontWeight: '600' },
+            title: 'Lava-Jatos Próximos',
+            headerStyle: { backgroundColor: '#0A7AFF' },
+            headerTitleStyle: { color: '#FFF', fontWeight: '600' },
             headerShadowVisible: false,
           }} />
           <Stack.Screen name="lavajato/[id]" options={{ headerShown: false }} />

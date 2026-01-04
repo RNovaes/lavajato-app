@@ -62,7 +62,7 @@ export default function paginaInicial() {
 
     const fazerLogin = async () => {
         if (validarCampos()) {
-            let tipo = 1
+            let tipo = 2
             if (tipo == 1) {
                 router.replace("/empresa")
             }else{

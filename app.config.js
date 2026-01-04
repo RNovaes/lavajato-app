@@ -3,9 +3,9 @@ export default {
   expo: {
     name: "lavajato-app",
     slug: "lavajato-app",
-    extra: {
-      googleApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
-    },
+    // extra: {
+    //   googleApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
+    // },
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
@@ -23,8 +23,14 @@ export default {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff"
       },
+      config: {
+        "googleMaps": {
+          "apiKey": process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
+        }
+      },
       edgeToEdgeEnabled: true,
     },
+    newArchEnabled: false,
     web: {
       bundler: "metro",
       output: "static",

@@ -42,6 +42,15 @@ export default function TabLayoutEmpresa() {
           }}
         />
 
+        <Tabs.Screen
+          name="buscar"
+          options={{
+            title: 'Buscar',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="search-outline" size={size} color={color} />
+            ),
+          }}
+        />
 
         <Tabs.Screen
           name="agendamentos"

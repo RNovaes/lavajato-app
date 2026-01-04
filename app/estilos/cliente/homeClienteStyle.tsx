@@ -60,7 +60,21 @@ const homeClientes = StyleSheet.create({
     arrow: { fontSize: 22, color: '#9CA3AF' },
     accountSection: { marginTop: 24, alignItems: 'center' },
     logout: { color: '#2563EB', fontSize: 15, marginBottom: 12 },
-    delete: { color: '#DC2626', fontSize: 14 }
+    delete: { color: '#DC2626', fontSize: 14 },
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    popup: {
+        width: '80%',
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+    },
+    tituloModal: { fontSize: 20, fontWeight: '600', color: '#111827' },
+    textosModal: { fontSize: 15, fontWeight: '500', color: '#111827', marginTop: 20 },
 });
 
 export default homeClientes
