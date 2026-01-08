@@ -2,10 +2,12 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'
-import painelStyle from '../../estilos/empresa/painelStyle';
+import painelStyle from './index.style';
+import { useRouter } from 'expo-router';
 
 export default function PainelDono() {
 
+  const rota = useRouter()
   return (
 
     <SafeAreaView style={painelStyle.safeArea} edges={['top']}>
@@ -52,7 +54,7 @@ export default function PainelDono() {
         </View>
 
         {/* CTA */}
-        <TouchableOpacity style={painelStyle.primaryButton}>
+        <TouchableOpacity style={painelStyle.primaryButton} onPress={() => rota.push('../lavajato/agendar')}>
           <Text style={painelStyle.primaryButtonText}>Novo agendamento</Text>
         </TouchableOpacity>
 

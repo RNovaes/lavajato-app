@@ -1,38 +1,16 @@
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity, Modal, Pressable } from 'react-native';
-import MapView, { Marker, Callout, CalloutSubview } from 'react-native-maps';
+import { View, Text, ActivityIndicator, TouchableOpacity, Modal } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import mapaStyle from '../estilos/mapa/mapaStyle';
+import mapaStyle from './index.style';
 import { useRouter } from 'expo-router';
 import { PrimaryButton, SecondaryButton } from '@/components/componentes';
-import { Ionicons } from '@expo/vector-icons';
+import { calcularDistancia, estaAberto } from '@/scripts/funcoes';
 
 export default function MapaLavaJatos() {
 
     const rota = useRouter()
-
-    function calcularDistancia(
-        lat1: number,
-        lon1: number,
-        lat2: number,
-        lon2: number
-    ) {
-        const R = 6371; // raio da Terra em km
-        const dLat = ((lat2 - lat1) * Math.PI) / 180;
-        const dLon = ((lon2 - lon1) * Math.PI) / 180;
-
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos((lat1 * Math.PI) / 180) *
-            Math.cos((lat2 * Math.PI) / 180) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2);
-
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    }
 
     const [location, setLocation] =
         useState<Location.LocationObjectCoords | null>(null);
@@ -54,10 +32,11 @@ export default function MapaLavaJatos() {
             nome: 'Lava Jato Central',
             latitude: -22.92940943542542,
             longitude: -43.63795854605003,
-            funcionamento: {
-                dias: [0, 2, 4, 5],
-                abertura: '00:00',
-                fechamento: '06:00',
+            dias: ['Seg', 'Qua', 'Sex', 'Sab'],
+            horarios: {
+                domingo: { abertura: null, fechamento: null },
+                sabado: { abertura: '09:16', fechamento: '14:16' },
+                semana: { abertura: '09:15', fechamento: '18:15' },
             },
         },
         {
@@ -65,13 +44,26 @@ export default function MapaLavaJatos() {
             nome: 'Brilho Rápido',
             latitude: -22.93044893478628,
             longitude: -43.64011113879609,
-            funcionamento: {
-                dias: [1, 3, 4, 6],
-                abertura: '08:00',
-                fechamento: '18:00',
+            dias: ['Dom', 'Ter', 'Qua', 'Qui', 'Sex'],
+            horarios: {
+                domingo: { abertura: null, fechamento: null },
+                sabado: { abertura: '09:16', fechamento: '14:16' },
+                semana: { abertura: '09:15', fechamento: '18:15' },
             },
         },
-    ];
+        {
+            id: 3,
+            nome: 'Quiqui',
+            latitude: -22.929676,
+            longitude: -43.640471,
+            dias: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui'],
+            horarios: {
+                domingo: { abertura: null, fechamento: null },
+                sabado: { abertura: '09:16', fechamento: '14:16' },
+                semana: { abertura: '09:15', fechamento: '18:15' },
+            },
+        },
+    ]
 
     useEffect(() => {
         let tentativas = 0;
@@ -147,26 +139,6 @@ export default function MapaLavaJatos() {
         );
     }
 
-    function estaAberto(funcionamento: any) {
-        const agora = new Date();
-
-        const diaHoje = agora.getDay(); // 0–6
-        if (!funcionamento.dias.includes(diaHoje)) {
-            return false;
-        }
-
-        const [aberturaH, aberturaM] = funcionamento.abertura.split(':').map(Number);
-        const [fechamentoH, fechamentoM] = funcionamento.fechamento.split(':').map(Number);
-
-        const abertura = new Date();
-        abertura.setHours(aberturaH, aberturaM, 0, 0);
-
-        const fechamento = new Date();
-        fechamento.setHours(fechamentoH, fechamentoM, 0, 0);
-
-        return agora >= abertura && agora <= fechamento;
-    }
-
     function abrirModal(id: any, nome: any, distancia: any, aberto: any) {
         setId(id)
         setNome(nome)
@@ -175,8 +147,15 @@ export default function MapaLavaJatos() {
         setVisivel(true)
     }
 
-    function irLavaJato(id: any) {
-        rota.push(`../lavajato/${id}`)
+    function irLavaJato(id: any, distancia: any) {
+        rota.push({
+            pathname: '/lavajato/[id]',
+            params: {
+                id: id,
+                distanciaKm: distancia,
+            },
+        });
+
         setVisivel(false)
     }
 
@@ -204,7 +183,7 @@ export default function MapaLavaJatos() {
 
                         <View style={{ marginTop: 15, flexDirection: 'row', gap: 5 }}>
                             <SecondaryButton label="Fechar" onPress={() => setVisivel(false)} />
-                            <PrimaryButton label="Ir" onPress={() => irLavaJato(id)} />
+                            <PrimaryButton label="Ir" onPress={() => irLavaJato(id, distancia)} />
                         </View>
                     </View>
                 </View>
@@ -230,7 +209,7 @@ export default function MapaLavaJatos() {
                             lava.longitude
                         );
 
-                        const aberto = estaAberto(lava.funcionamento);
+                        const aberto = estaAberto(lava.dias, lava.horarios);
 
                         return (
 

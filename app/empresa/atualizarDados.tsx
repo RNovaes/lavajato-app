@@ -1,20 +1,19 @@
 
 // app/empresa/atualizardados.tsx
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Switch, KeyboardAvoidingView, Platform } from 'react-native';
-import { useState } from 'react';
-import { Stack } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import Geocoder from 'react-native-geocoding';
-import * as Location from 'expo-location';
-import atualizarStyle from '../estilos/empresa/atualizarDadosStyle';
+import { Card, CardInfo, ChipCust, Infos, PrimaryButton, SecondaryButton, Tag } from '@/components/componentes';
+import { formatarHora } from '@/scripts/funcoes';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChipCust, SecondaryButton, PrimaryButton, Tag, Card } from '@/components/componentes';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import CurrencyInput from 'react-native-currency-input';
-import { Chip } from 'react-native-paper';
-import { useRouter } from 'expo-router'
+import DateTimePicker from '@react-native-community/datetimepicker';
 import Constants from 'expo-constants';
+import * as Location from 'expo-location';
+import { Stack, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import CurrencyInput from 'react-native-currency-input';
+import Geocoder from 'react-native-geocoding';
+import { Chip } from 'react-native-paper';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import atualizarStyle from './atualizarDados.style';
 
 const BG = '#FFFFFF';
 
@@ -35,6 +34,18 @@ export default function AtualizarDadosEmpresa() {
     const [horaFechamentoSabado, setHoraFechamentoSabado] = useState<Date | null>(null);
     const [horaFechamentoDomingo, setHoraFechamentoDomingo] = useState<Date | null>(null);
     const [endereco, setEndereco] = useState<string>("");
+    const [latitude, setLatitude] = useState<number | null>(null);
+    const [longitude, setLongitude] = useState<number | null>(null);
+    const [rua, setRua] = useState('');
+    const [numero, setNumero] = useState('');
+    const [bairro, setBairro] = useState('');
+    const [cidade, setCidade] = useState('');
+    const [estado, setEstado] = useState('');
+    const [focusedRua, setFocusedRua] = useState(false);
+    const [focusedNumero, setFocusedNumero] = useState(false);
+    const [focusedBairro, setFocusedBairro] = useState(false);
+    const [focusedCidade, setFocusedCidade] = useState(false);
+    const [focusedEstado, setFocusedEstado] = useState(false);
 
     function toggleArray(value: string, array: string[], setArray: any) {
         setArray(array.includes(value)
@@ -96,11 +107,41 @@ export default function AtualizarDadosEmpresa() {
         }
     }
 
+    useEffect(() => {
+        if (mesmoHorarioFimSemana) {
+            if (dias.includes('Sab') && dias.includes('Dom')) {
+                setHoraAberturaSabado(horaAbertura);
+                setHoraAberturaDomingo(horaAbertura);
+                setHoraFechamentoSabado(horaFechamento);
+                setHoraFechamentoDomingo(horaFechamento);
+            } else if (dias.includes('Sab')) {
+                setHoraAberturaSabado(horaAbertura);
+                setHoraFechamentoSabado(horaFechamento);
+            } else if (dias.includes('Dom')) {
+                setHoraAberturaDomingo(horaAbertura);
+                setHoraFechamentoDomingo(horaFechamento);
+            }
+        } else {
+            setHoraAberturaSabado(null);
+            setHoraAberturaDomingo(null);
+            setHoraFechamentoSabado(null);
+            setHoraFechamentoDomingo(null);
+        }
+    }, [mesmoHorarioFimSemana, horaAbertura, horaFechamento]);
+
+
     const GOOGLE_API_KEY = Constants.expoConfig?.extra?.googleApiKey;
 
-    Geocoder.init(GOOGLE_API_KEY);
+    useEffect(() => {
+        if (GOOGLE_API_KEY) {
+            Geocoder.init(GOOGLE_API_KEY);
+        }
+    }, []);
+
+    // Geocoder.init(GOOGLE_API_KEY);
 
     const obterLocalizacao = async () => {
+
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
             console.log("Permissão negada");
@@ -112,6 +153,9 @@ export default function AtualizarDadosEmpresa() {
         });
 
         const { latitude, longitude } = location.coords;
+
+        setLatitude(latitude);
+        setLongitude(longitude);
 
         atualizarEndereco(latitude, longitude);
     };
@@ -125,21 +169,54 @@ export default function AtualizarDadosEmpresa() {
             .catch(error => console.warn(error));
     };
 
-    const [focusedLocalizacao, setFocusedLocalzacao] = useState(false);
+    const geocodificarEndereco = async () => {
+        const enderecoCompleto = montarEndereco();
+
+        console.log('Endereço enviado:', enderecoCompleto);
+        setEndereco(enderecoCompleto)
+
+        try {
+            const resultado = await Geocoder.from(enderecoCompleto);
+
+            if (!resultado.results.length) {
+                Alert.alert('Endereço não encontrado');
+                return;
+            }
+
+            const { lat, lng } = resultado.results[0].geometry.location;
+
+            setLatitude(lat);
+            setLongitude(lng);
+        } catch (error) {
+            console.log('Erro ao geocodificar:', error);
+            Alert.alert('Erro ao validar endereço');
+        }
+    };
+
+    const montarEndereco = () => {
+        return `${rua}, ${numero}, ${bairro}, ${cidade} - ${estado}, Brasil`;
+    };
 
     // ============================================== ETAPA 2 ================================================================
 
-    const obrigatorios = [
+    const veiculosDisponiveis = [
         "Sedan",
-        "Hatch"
+        "Hatch",
+        "SUV",
+        "Picape",
+        "Van",
+        "Carga"
     ];
     const [focused, setFocused] = useState(false);
     const [focusedInput, setFocusedInput] = useState<string | null>(null);
     const [focusedInputHorario, setFocusedInputHorario] = useState<string | null>(null);
     const [capacidade, setCapacidade] = useState('');
     const [veiculos, setVeiculos] = useState<string[]>([])
+    const [valorLavagem, setValorLavagem] = useState<Record<string, number | null>>({});
+    const [checkVeiculos, setcheckVeiculos] = useState(false)
 
     const toggleVeiculo = (tipo: string) => {
+        setcheckVeiculos(true)
         setVeiculos(prev => {
             if (prev.includes(tipo)) {
                 return prev.filter(i => i !== tipo);
@@ -170,34 +247,29 @@ export default function AtualizarDadosEmpresa() {
     const [tempoVeiculo, setTempoVeiculo] = useState<Record<string, TempoValue>>({
         Sedan: { horas: '', minutos: '' },
         Hatch: { horas: '', minutos: '' },
-        Suv: { horas: '', minutos: '' },
+        SUV: { horas: '', minutos: '' },
         Picape: { horas: '', minutos: '' },
         Van: { horas: '', minutos: '' },
         Carga: { horas: '', minutos: '' },
     });
 
-    function calcularMinutos({ horas, minutos }: any) {
-        const h = parseInt(horas || '0', 10);
-        const m = parseInt(minutos || '0', 10);
-        return h * 60 + m;
-    }
-
-    // const tempoHatchMin = calcularMinutos(tempoVeiculo.Hatch);
-    // const tempoSedanMin = calcularMinutos(tempoVeiculo.Sedan);
-    // console.log(tempoHatchMin)
-    // console.log(tempoSedanMin)
-
     // ============================================== ETAPA 3 ================================================================
 
-    const servicoObrigatorio = [
-        "Lavagem Completa"
+    const servicosDisponiveis = [
+        "Lavagem Interna",
+        "Lavagem Externa",
+        "Enceramento",
+        "Polimento",
+        "Delivery",
+        "Lavagem de Motor"
     ];
 
     const [servicos, setServicos] = useState<string[]>([]);
     const [pagamentos, setPagamentos] = useState<string[]>([]);
-    const [valores, setValores] = useState<Record<string, number | null>>({});
+    const [checkServicos, setcheckServicos] = useState(false)
 
     const toggleServico = (item: string) => {
+        setcheckServicos(true)
         setServicos(prev => {
             if (prev.includes(item)) {
                 return prev.filter(i => i !== item);
@@ -214,9 +286,85 @@ export default function AtualizarDadosEmpresa() {
         );
     }
 
+    // function servicosValores(servico: string, valor: number | null) {
+    //     setServicosValores(prev => ({
+    //         ...prev,
+    //         [servico]: {
+    //             ...prev[servico],
+    //             valor,
+    //         },
+    //     }));
+    // }
+
+    // type Serv = {
+    //     servico: string;
+    //     valor: number | null;
+    // };
+
+    const [servicosValores, setServicosValores] = useState<
+        Record<string, number | null>
+    >({});
+
+
+    function atualizarServico(servico: string, valor: number | null) {
+        setServicosValores(prev => ({
+            ...prev,
+            [servico]: valor,
+        }));
+    }
+
+    const servicosArray = Object.entries(servicosValores).map(
+        ([servico, valor]) => ({ servico, valor })
+    );
+
+
+    // const [servicosValoresJuntos, setServicosValores] = useState<Record<string, Serv>>({
+    //     "Lavagem Interna": { servico: "Lavagem Interna", valor: null },
+    //     "Lavagem Externa": { servico: "Lavagem Externa", valor: null },
+    //     Enceramento: { servico: "Enceramento", valor: null },
+    //     Polimento: { servico: "Polimento", valor: null },
+    //     Delivery: { servico: "Delivery", valor: null },
+    //     "Lavagem de Motor": { servico: "Lavagem de Motor", valor: null },
+    // });
+
+
     function finalizarCadastro() {
 
-        console.log('Enviar')
+        const dados = {
+            dias: dias,
+            horarios: {
+                semana: {
+                    abertura: horaAbertura ? formatarHora(horaAbertura) : null,
+                    fechamento: horaFechamento ? formatarHora(horaFechamento) : null,
+                },
+                sabado: {
+                    abertura: horaAberturaSabado ? formatarHora(horaAberturaSabado) : null,
+                    fechamento: horaFechamentoSabado ? formatarHora(horaFechamentoSabado) : null,
+                },
+                domingo: {
+                    abertura: horaAberturaDomingo ? formatarHora(horaAberturaDomingo) : null,
+                    fechamento: horaFechamentoDomingo ? formatarHora(horaFechamentoDomingo) : null,
+                },
+            },
+            endereco: endereco,
+            latitude: latitude,
+            longitude: longitude,
+            capacidade: Number(capacidade),
+            tipos_veiculos: veiculos,
+            tempoVeiculo: tempoVeiculo,
+            valorlavagemcompleta: valorLavagem,
+            servicos_adicionais: servicos,
+            pagamentos: pagamentos,
+            imagemUrl: require('../../assets/images/ChatGPT Image 5 de jan. de 2026, 16_53_57.png'),
+            valores_servicos: servicosArray
+        }
+        console.log(dados)
+
+        // if (!rua || !numero || !cidade || !estado) {
+        //     Alert.alert('Preencha todos os campos obrigatórios');
+        //     return;
+        // }
+
         rota.replace('/empresa/painel')
 
     }
@@ -278,75 +426,135 @@ export default function AtualizarDadosEmpresa() {
                             {!mesmoHorarioFimSemana && (
                                 <Card title="Horário fim de semana">
 
-                                    <View>
-                                        <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>Sábado</Text>
-                                        <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('aberturaSabado')}>
-                                            <Text>
-                                                {horaAberturaSabado
-                                                    ? horaAberturaSabado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-                                                    : 'Selecionar horário de abertura'}
-                                            </Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('fechamentoSabado')}>
-                                            <Text>
-                                                {horaFechamentoSabado
-                                                    ? horaFechamentoSabado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-                                                    : 'Selecionar horário de fechamento'}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    </View>
-
-                                    <View>
-                                        <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>Domingo</Text>
-                                        <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('aberturaDomingo')}>
-                                            <Text>
-                                                {horaAberturaDomingo
-                                                    ? horaAberturaDomingo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-                                                    : 'Selecionar horário de abertura'}
-                                            </Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('fechamentoDomingo')}>
-                                            <Text>
-                                                {horaFechamentoDomingo
-                                                    ? horaFechamentoDomingo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-                                                    : 'Selecionar horário de fechamento'}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    </View>
-
+                                    {dias.includes('Sab') && (
+                                        <View>
+                                            <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>Sábado</Text>
+                                            <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('aberturaSabado')}>
+                                                <Text>
+                                                    {horaAberturaSabado
+                                                        ? horaAberturaSabado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                                                        : 'Selecionar horário de abertura'}
+                                                </Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('fechamentoSabado')}>
+                                                <Text>
+                                                    {horaFechamentoSabado
+                                                        ? horaFechamentoSabado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                                                        : 'Selecionar horário de fechamento'}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    )}
+                                    {dias.includes('Dom') && (
+                                        <View>
+                                            <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>Domingo</Text>
+                                            <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('aberturaDomingo')}>
+                                                <Text>
+                                                    {horaAberturaDomingo
+                                                        ? horaAberturaDomingo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                                                        : 'Selecionar horário de abertura'}
+                                                </Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('fechamentoDomingo')}>
+                                                <Text>
+                                                    {horaFechamentoDomingo
+                                                        ? horaFechamentoDomingo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                                                        : 'Selecionar horário de fechamento'}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    )}
                                 </Card>
                             )}
 
                             <Card title="Localização">
 
-                                <View>
-                                    {endereco === "" && (
-                                        <TextInput
-                                            placeholder="Endereço"
-                                            value={endereco}
-                                            onChangeText={setEndereco}
-                                            style={[atualizarStyle.in, focusedLocalizacao && atualizarStyle.inputFocused,]}
-                                            maxLength={50}
-                                            onFocus={() => setFocusedLocalzacao(true)}
-                                            onBlur={() => setFocusedLocalzacao(false)}
-                                        />
-                                    )}{endereco !== "" && (
+                                {/* <TextInput
+                                    placeholder="Rua, Número, Cidade - UF"
+                                    value={endereco}
+                                    onChangeText={setEndereco}
+                                    style={[
+                                        atualizarStyle.in,
+                                        focusedLocalizacao && atualizarStyle.inputFocused,
+                                    ]}
+                                    onFocus={() => setFocusedLocalzacao(true)}
+                                    onBlur={() => setFocusedLocalzacao(false)}
+                                    maxLength={50}
+                                /> */}
 
-                                        <TextInput
-                                            placeholder="Endereço"
-                                            readOnly={true}
-                                            value={endereco}
-                                            onChangeText={setEndereco}
-                                            style={[atualizarStyle.in, focusedLocalizacao && atualizarStyle.inputFocused,]}
-                                            maxLength={50}
-                                            onFocus={() => setFocusedLocalzacao(true)}
-                                            onBlur={() => setFocusedLocalzacao(false)}
-                                        />
+                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 20 }}>
+                                    <TextInput
+                                        placeholder="Rua / Avenida"
+                                        value={rua}
+                                        onChangeText={setRua}
+                                        style={[
+                                            atualizarStyle.in,
+                                            focusedRua && atualizarStyle.inputFocused,
+                                        ]}
+                                        onFocus={() => setFocusedRua(true)}
+                                        onBlur={() => setFocusedRua(false)}
+                                        maxLength={50}
+                                    />
 
-                                    )}
+                                    <TextInput
+                                        placeholder="Número"
+                                        value={numero}
+                                        onChangeText={setNumero}
+                                        keyboardType="numeric"
+                                        style={[
+                                            { width: '30%', backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1 },
+                                            focusedNumero && atualizarStyle.inputFocused,
+                                        ]}
+                                        onFocus={() => setFocusedNumero(true)}
+                                        onBlur={() => setFocusedNumero(false)}
+                                        maxLength={5}
+                                    />
+
+                                    <TextInput
+                                        placeholder="Bairro"
+                                        value={bairro}
+                                        onChangeText={setBairro}
+                                        style={[
+                                            { width: '60%', backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1 },
+                                            focusedBairro && atualizarStyle.inputFocused,
+                                        ]}
+                                        onFocus={() => setFocusedBairro(true)}
+                                        onBlur={() => setFocusedBairro(false)}
+                                        maxLength={20}
+                                    />
+
+                                    <TextInput
+                                        placeholder="Cidade"
+                                        value={cidade}
+                                        onChangeText={setCidade}
+                                        style={[
+                                            { width: '60%', backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1 },
+                                            focusedCidade && atualizarStyle.inputFocused,
+                                        ]}
+                                        onFocus={() => setFocusedCidade(true)}
+                                        onBlur={() => setFocusedCidade(false)}
+                                        maxLength={20}
+                                    />
+
+                                    <TextInput
+                                        placeholder="UF"
+                                        value={estado}
+                                        onChangeText={(text) => setEstado(text.toUpperCase())}
+                                        maxLength={2}
+                                        autoCapitalize="characters"
+                                        style={[
+                                            { width: '30%', backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1 },
+                                            focusedEstado && atualizarStyle.inputFocused,
+                                        ]}
+                                        onFocus={() => setFocusedEstado(true)}
+                                        onBlur={() => setFocusedEstado(false)}
+                                    />
+
                                 </View>
 
-                                <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 10 }}>
+                                <PrimaryButton onPress={geocodificarEndereco} label='Validar Endereço'></PrimaryButton>
+
+                                <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 10, marginTop: 10 }}>
                                     <View style={{
                                         height: 2,
                                         width: '35%',
@@ -368,11 +576,13 @@ export default function AtualizarDadosEmpresa() {
 
                                     <View style={atualizarStyle.containerEndereco}>
                                         <Ionicons name="location-outline" size={20} color="#333" style={{ marginRight: 5 }} />
-                                        <Text style={atualizarStyle.textoEndereco}>Endereço: {endereco}</Text>
+                                        <Text style={atualizarStyle.textoEndereco}>{endereco}</Text>
                                     </View>
 
                                 )}
+
                                 <PrimaryButton onPress={obterLocalizacao} label="Obter Localização" />
+
                             </Card>
 
                             {campoHorario && (
@@ -399,7 +609,10 @@ export default function AtualizarDadosEmpresa() {
                         <>
                             <Text style={{ fontSize: 18, fontWeight: '700', marginTop: 12 }}>Capacidade e veículos</Text>
 
-                            <Card title="Capacidade simultânea">
+
+                            <CardInfo title="Capacidade simultânea">
+
+                                <Infos texto="Informe quantos veículos podem ser atendidos ao mesmo tempo."></Infos>
                                 <TextInput
                                     placeholder="Quantidade de carros"
                                     value={capacidade}
@@ -410,158 +623,100 @@ export default function AtualizarDadosEmpresa() {
                                     onFocus={() => setFocused(true)}
                                     onBlur={() => setFocused(false)}
                                 />
-                            </Card>
+                            </CardInfo>
 
                             <Card title="Tipos de veículos">
                                 <View style={atualizarStyle.chipContainer}>
-                                    {['Sedan', 'Hatch', 'Suv', 'Picape', 'Van', 'Carga'].map(tipo => {
-                                        const obrigatorio = obrigatorios.includes(tipo);
-                                        const ativo = veiculos.includes(tipo) || obrigatorio;
 
-                                        return (
-                                            <Chip
-                                                key={tipo}
-                                                selected={ativo}
-                                                disabled={obrigatorio}
-                                                onPress={
-                                                    obrigatorio ? undefined : () => toggleVeiculo(tipo)
-                                                }
-                                                style={[
-                                                    atualizarStyle.chip,
-                                                    ativo && atualizarStyle.chipActive,
-                                                    obrigatorio && atualizarStyle.chipObrigatorio,
-                                                ]}
-                                                textStyle={[
-                                                    atualizarStyle.chipText,
-                                                    ativo && atualizarStyle.chipTextActive,
-                                                ]}
-                                                showSelectedCheck={false}
-                                            >
-                                                {tipo}
-                                            </Chip>
-                                        );
-                                    })}
-                                </View>
-                            </Card>
+                                    {veiculosDisponiveis.map((tipo, index) => (
 
-                            <Card title="Tempo Médio Por Veículo">
+                                        <View key={index}>
 
-                                <View style={atualizarStyle.tempoContainer}>
-                                    <Text style={atualizarStyle.tempoLabel}>{'Sedan'}</Text>
-
-                                    <View style={atualizarStyle.tempoInputs}>
-
-                                        <TextInput
-                                            keyboardType="numeric"
-                                            placeholder="h"
-                                            value={tempoVeiculo.Sedan.horas}
-                                            onChangeText={text => atualizarTempo('Sedan', 'horas', text)}
-                                            style={[
-                                                atualizarStyle.tempoInput,
-                                                focusedInputHorario === 'Sedan' && atualizarStyle.inputFocused,
-                                            ]}
-                                            onFocus={() => setFocusedInputHorario('Sedan')}
-                                            onBlur={() => setFocusedInputHorario(null)}
-                                            maxLength={1}
-                                        />
-
-                                        <Text style={atualizarStyle.tempoSeparador}>:</Text>
-
-                                        <TextInput
-                                            keyboardType="numeric"
-                                            placeholder="min"
-                                            value={tempoVeiculo.Sedan.minutos}
-                                            onChangeText={text => atualizarTempo('Sedan', 'minutos', text)}
-                                            style={[
-                                                atualizarStyle.tempoInput,
-                                                focusedInputHorario === 'Sedan' && atualizarStyle.inputFocused,
-                                            ]}
-                                            onFocus={() => setFocusedInputHorario('Sedan')}
-                                            onBlur={() => setFocusedInputHorario(null)}
-                                            maxLength={2}
-                                        />
-
-                                    </View>
-
-                                    <Text style={{ marginTop: 5 }}></Text>
-                                    <Text style={atualizarStyle.tempoLabel}>{'Hatch'}</Text>
-
-                                    <View style={atualizarStyle.tempoInputs}>
-                                        <TextInput
-                                            keyboardType="numeric"
-                                            placeholder="h"
-                                            value={tempoVeiculo.Hatch.horas}
-                                            onChangeText={text => atualizarTempo('Hatch', 'horas', text)}
-                                            underlineColorAndroid="transparent"
-                                            style={[
-                                                atualizarStyle.tempoInput,
-                                                focusedInputHorario === 'Hatch' && atualizarStyle.inputFocused,
-                                            ]}
-                                            onFocus={() => setFocusedInputHorario('Hatch')}
-                                            onBlur={() => setFocusedInputHorario(null)}
-                                            maxLength={1}
-                                        />
-
-                                        <Text style={atualizarStyle.tempoSeparador}>:</Text>
-
-                                        <TextInput
-                                            keyboardType="numeric"
-                                            placeholder="min"
-                                            value={tempoVeiculo.Hatch.minutos}
-                                            onChangeText={text => atualizarTempo('Hatch', 'minutos', text)}
-                                            style={[
-                                                atualizarStyle.tempoInput,
-                                                focusedInputHorario === 'Hatch' && atualizarStyle.inputFocused,
-                                            ]}
-                                            onFocus={() => setFocusedInputHorario('Hatch')}
-                                            onBlur={() => setFocusedInputHorario(null)}
-                                            maxLength={2}
-                                        />
-                                    </View>
-                                </View>
-
-                                {veiculos.map(vcl => (
-
-                                    <View key={vcl} style={atualizarStyle.tempoContainer}>
-                                        <Text style={atualizarStyle.tempoLabel}>{vcl}</Text>
-
-                                        <View style={atualizarStyle.tempoInputs}>
-                                            <TextInput
-                                                keyboardType="numeric"
-                                                placeholder="h"
-                                                value={tempoVeiculo[vcl]?.horas ?? ''}
-                                                onChangeText={text => atualizarTempo(vcl, 'horas', text)}
-                                                underlineColorAndroid="transparent"
-                                                style={[
-                                                    atualizarStyle.tempoInput,
-                                                    focusedInputHorario === vcl && atualizarStyle.inputFocused,
-                                                ]}
-                                                onFocus={() => setFocusedInputHorario(vcl)}
-                                                onBlur={() => setFocusedInputHorario(null)}
-                                                maxLength={1}
+                                            <ChipCust
+                                                label={tipo}
+                                                active={veiculos.includes(tipo)}
+                                                onPress={() => toggleVeiculo(tipo)}
                                             />
 
-                                            <Text style={atualizarStyle.tempoSeparador}>:</Text>
-
-                                            <TextInput
-                                                keyboardType="numeric"
-                                                placeholder="min"
-                                                value={tempoVeiculo[vcl]?.minutos ?? ''}
-                                                onChangeText={text => atualizarTempo(vcl, 'minutos', text)}
-                                                style={[
-                                                    atualizarStyle.tempoInput,
-                                                    focusedInputHorario === vcl && atualizarStyle.inputFocused,
-                                                ]}
-                                                onFocus={() => setFocusedInputHorario(vcl)}
-                                                onBlur={() => setFocusedInputHorario(null)}
-                                                maxLength={2}
-                                            />
                                         </View>
-                                    </View>
-
-                                ))}
-
+                                    ))}
+                                </View>
                             </Card>
+
+                            {checkVeiculos && (
+                                <Card title="Tempo Médio Por Veículo / Valores">
+
+                                    {veiculos.map(vcl => (
+
+                                        <View key={vcl} style={atualizarStyle.tempoContainer}>
+
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <Text style={atualizarStyle.tempoLabel}>{vcl}</Text>
+                                                <Text style={atualizarStyle.tempoLabel}>{'Lavagem Completa'}</Text>
+                                            </View>
+
+                                            <View style={atualizarStyle.tempoInputs}>
+                                                <TextInput
+                                                    keyboardType="numeric"
+                                                    placeholder="h"
+                                                    value={tempoVeiculo[vcl]?.horas ?? ''}
+                                                    onChangeText={text => atualizarTempo(vcl, 'horas', text)}
+                                                    underlineColorAndroid="transparent"
+                                                    style={[
+                                                        atualizarStyle.tempoInput,
+                                                        focusedInputHorario === vcl && atualizarStyle.inputFocused,
+                                                    ]}
+                                                    onFocus={() => setFocusedInputHorario(vcl)}
+                                                    onBlur={() => setFocusedInputHorario(null)}
+                                                    maxLength={1}
+                                                />
+
+                                                <Text style={atualizarStyle.tempoSeparador}>:</Text>
+
+                                                <TextInput
+                                                    keyboardType="numeric"
+                                                    placeholder="min"
+                                                    value={tempoVeiculo[vcl]?.minutos ?? ''}
+                                                    onChangeText={text => atualizarTempo(vcl, 'minutos', text)}
+                                                    style={[
+                                                        atualizarStyle.tempoInput,
+                                                        focusedInputHorario === vcl && atualizarStyle.inputFocused,
+                                                    ]}
+                                                    onFocus={() => setFocusedInputHorario(vcl)}
+                                                    onBlur={() => setFocusedInputHorario(null)}
+                                                    maxLength={2}
+                                                />
+
+                                                <View style={{ marginLeft: 12 }}>
+                                                    <CurrencyInput
+                                                        placeholder={'R$ 0,00'}
+                                                        value={valorLavagem[vcl] ?? null}
+                                                        onChangeValue={value =>
+                                                            setValorLavagem(prev => ({
+                                                                ...prev,
+                                                                [vcl]: value,
+                                                            }))
+                                                        }
+                                                        prefix="R$ "
+                                                        delimiter="."
+                                                        separator=","
+                                                        precision={2}
+                                                        keyboardType="numeric"
+                                                        underlineColorAndroid="transparent"
+                                                        style={[
+                                                            atualizarStyle.inputValores,
+                                                            focusedInput === vcl && atualizarStyle.inputFocused,
+                                                        ]}
+                                                        onFocus={() => setFocusedInput(vcl)}
+                                                        onBlur={() => setFocusedInput(null)}
+                                                    />
+                                                </View>
+
+                                            </View>
+                                        </View>
+                                    ))}
+                                </Card>
+                            )}
                         </>
                     )}
 
@@ -570,91 +725,56 @@ export default function AtualizarDadosEmpresa() {
                         <>
                             <Text style={{ fontSize: 18, fontWeight: '700', marginTop: 12 }}>Serviços e pagamento</Text>
 
-                            <Card title="Serviços">
+                            <CardInfo title="Serviços Adicionais">
 
-                                <View style={atualizarStyle.chipContainer}>
-                                    {["Lavagem Completa", "Lavagem Interna", "Lavagem Externa", "Enceramento", "Polimento", "Delivery", "Lavagem de Motor"].map(item => {
-                                        const servObri = servicoObrigatorio.includes(item);
-                                        const ativo = servicos.includes(item) || servObri;
-                                        return (
-                                            <Chip key={item} mode='outlined' selected={ativo} disabled={servObri} onPress={
-                                                servObri ? undefined : () => toggleServico(item)
-                                            }
-                                                style={[
-                                                    atualizarStyle.chip,
-                                                    ativo && atualizarStyle.chipActive,
-                                                    servObri && atualizarStyle.chipObrigatorio,
-                                                ]}
-                                                textStyle={[
-                                                    atualizarStyle.chipText,
-                                                    ativo && atualizarStyle.chipTextActive,
-                                                ]} showSelectedCheck={false}>{item}</Chip>
-                                        )
-                                    })}
+                                <Infos texto='Aqui você pode informar todos os serviços adicionais que são oferecidos.'></Infos>
+                                <View style={atualizarStyle.chipContainerServicos}>
+                                    {servicosDisponiveis.map((item, index) => (
+
+                                        <ChipCust
+                                            key={index}
+                                            label={item}
+                                            active={servicos.includes(item)}
+                                            onPress={() => toggleServico(item)}
+                                        />
+
+                                    ))}
                                 </View>
 
-                            </Card>
+                            </CardInfo>
 
-                            <Card title="Valores">
+                            {checkServicos && (
 
-                                {servicoObrigatorio.map(newServ => (
-                                    <View key={newServ} style={{ marginBottom: 12 }}>
-                                        <CurrencyInput
-                                            placeholder={'R$ - ' + newServ}
-                                            value={valores[newServ] ?? null}
-                                            onChangeValue={value =>
-                                                setValores(prev => ({
-                                                    ...prev,
-                                                    [newServ]: value,
-                                                }))
-                                            }
-                                            prefix="R$ "
-                                            delimiter="."
-                                            separator=","
-                                            precision={2}
-                                            keyboardType="numeric"
-                                            underlineColorAndroid="transparent"
-                                            style={[
-                                                atualizarStyle.inputValores,
-                                                focusedInput === newServ && atualizarStyle.inputFocused,
-                                            ]}
-                                            onFocus={() => setFocusedInput(newServ)}
-                                            onBlur={() => setFocusedInput(null)}
-                                        />
-                                    </View>
-                                ))}
+                                <>
+                                    <Card title="Valores">
 
-                                {servicos.map(serv => (
-                                    <View key={serv} style={{ marginBottom: 12 }}>
-                                        <CurrencyInput
-                                            placeholder={'R$ - ' + serv}
-                                            value={valores[serv] ?? null}
-                                            onChangeValue={value =>
-                                                setValores(prev => ({
-                                                    ...prev,
-                                                    [serv]: value,
-                                                }))
-                                            }
-                                            prefix="R$ "
-                                            delimiter="."
-                                            separator=","
-                                            precision={2}
-                                            keyboardType="numeric"
-                                            underlineColorAndroid="transparent"
-                                            style={[
-                                                atualizarStyle.inputValores,
-                                                focusedInput === serv && atualizarStyle.inputFocused,
-                                            ]}
-                                            onFocus={() => setFocusedInput(serv)}
-                                            onBlur={() => setFocusedInput(null)}
-                                        />
-                                    </View>
-                                ))
-                                }
+                                        {servicos.map(serv => (
+                                            <View key={serv} style={{ marginBottom: 12 }}>
+                                                <CurrencyInput
+                                                    placeholder={'R$ - ' + serv}
+                                                    value={servicosValores[serv] ?? null}
+                                                    onChangeValue={(value) => atualizarServico(serv, value)}
+                                                    prefix="R$ "
+                                                    delimiter="."
+                                                    separator=","
+                                                    precision={2}
+                                                    keyboardType="numeric"
+                                                    style={[
+                                                        atualizarStyle.inputValoresServicos,
+                                                        focusedInput === serv && atualizarStyle.inputFocused,
+                                                    ]}
+                                                />
+                                            </View>
+                                        ))
+                                        }
+                                    </Card>
 
-                            </Card>
+                                    <Text style={{ fontSize: 8 }}>Os valores informados acima, são referentes para todos os tipos de veiculos aceitos, caso os valores de serviços adicionais sejam diferentes
+                                        para cada tipo de veículo, após o cadastro, procure no menu de serviços por "alterar valores", marque a caixa "valores diferentes por tipo de veículos" e informe os valores corretos.</Text>
+                                </>
+                            )}
 
-                            <Card title="Pagamento">
+                            <Card title="Formas de Pagamento">
 
                                 <View style={atualizarStyle.chipContainer}>
                                     {['Dinheiro', 'Pix', 'Crédito', 'Débito'].map(item => (

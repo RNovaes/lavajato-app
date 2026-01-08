@@ -2,7 +2,7 @@
 import { View, Text, TouchableOpacity, Vibration } from 'react-native';
 import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import cadastroStyle from './estilos/cadastroStyle';
+import cadastroStyle from './cadastro.style';
 import { useFocusEffect } from '@react-navigation/native';
 import MeuTextInput from '@/components/MeuTextInput';
 import { Ionicons } from '@expo/vector-icons';

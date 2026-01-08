@@ -5,7 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import { Text, TouchableOpacity, Vibration, View } from 'react-native';
-import paginaInicialStyle from './estilos/paginaInicial';
+import paginaInicialStyle from './index.style';
 
 export default function paginaInicial() {
 
@@ -63,10 +63,12 @@ export default function paginaInicial() {
     const fazerLogin = async () => {
         if (validarCampos()) {
             let tipo = 2
+            let id = "01"
             if (tipo == 1) {
                 router.replace("/empresa")
             }else{
-                router.replace("/cliente")
+                // router.replace("/cliente")
+                router.replace(`/lavajato/${id}`)
             }
         }
     }

@@ -1,6 +1,8 @@
 
-import atualizarStyle from '@/app/estilos/empresa/atualizarDadosStyle';
-import { View, Text, TouchableOpacity } from 'react-native'
+import atualizarStyle from '@/app/empresa/atualizarDados.style';
+import { useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { IconButton, Modal, Portal } from 'react-native-paper';
 
 const CARD = '#F9FAFB';
 const PRIMARY = '#2563EB';
@@ -8,6 +10,15 @@ const PRIMARY = '#2563EB';
 export function Card({ title, children }: any) {
     return (
         <View style={{ backgroundColor: CARD, borderRadius: 12, padding: 16, marginTop: 16 }}>
+            <Text style={{ fontWeight: '600', marginBottom: 12 }}>{title}</Text>
+            {children}
+        </View>
+    );
+}
+
+export function CardInfo({ title, children }: any) {
+    return (
+        <View style={{ backgroundColor: CARD, borderRadius: 12, padding: 16, marginTop: 16, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
             <Text style={{ fontWeight: '600', marginBottom: 12 }}>{title}</Text>
             {children}
         </View>
@@ -58,5 +69,35 @@ export function ChipCust({ label, active, onPress }: any) {
                 {label}
             </Text>
         </TouchableOpacity>
+    )
+}
+
+export function Infos({texto}: any) {
+    const [visible, setVisible] = useState(false);
+    return (
+        <>
+            <IconButton
+                icon="help-circle-outline"
+                size={18}
+                onPress={() => setVisible(true)}
+                iconColor='blue'
+            />
+            <Portal>
+                <Modal
+                    visible={visible}
+                    onDismiss={() => setVisible(false)}
+                    contentContainerStyle={{
+                        backgroundColor: 'white',
+                        padding: 20,
+                        margin: 20,
+                        borderRadius: 8,
+                    }}
+                >
+                    <Text>
+                        {texto}
+                    </Text>
+                </Modal>
+            </Portal>
+        </>
     )
 }

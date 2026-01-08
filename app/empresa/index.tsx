@@ -2,7 +2,7 @@
 import React from 'react';
 import { Text, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import alertaStyle from '../estilos/empresa/alertaStyle';
+import alertaStyle from './index.style';
 import { Image, View } from "react-native";
 
 export default function ContinuarCadastro() {

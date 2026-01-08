@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../estilos/cliente/padraoStyle';
+import styles from './padraoStyle';
 
 export default function Agendamentos() {
     return (

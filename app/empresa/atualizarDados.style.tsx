@@ -79,7 +79,8 @@ const atualizarStyle = StyleSheet.create({
   containerEndereco: {
     flexDirection: 'row', // ícone + texto na horizontal
     alignItems: 'center',
-    marginVertical: 10,   // espaço entre os botões e o endereço
+    marginVertical: 10,
+    width: '100%'
   },
 
   textoEndereco: {
@@ -158,6 +159,7 @@ const atualizarStyle = StyleSheet.create({
     alignItems: "center",
 
   },
+  
   chipContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -173,8 +175,23 @@ const atualizarStyle = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
 
+  chipContainerServicos: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 7
+  },
+
+  chipServicos: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB'
+  },
+
   chipActive: {
-    // backgroundColor: '#2563EB',
+    backgroundColor: '#2563EB',
     borderColor: '#2563EB',
   },
 
@@ -184,19 +201,15 @@ const atualizarStyle = StyleSheet.create({
   },
 
   chipTextActive: {
-    // color: '#FFFFFF',
-    color: 'black',
+    color: '#FFFFFF',
+    // color: 'black',
     fontWeight: '600',
-  },
-
-  chipObrigatorio: {
-    opacity: 0.8,
   },
 
   tempoContainer: {
     padding: 12,
     backgroundColor: '#F9FAFB',
-    borderRadius: 12,
+    borderRadius: 12
   },
 
   tempoLabel: {
@@ -228,7 +241,7 @@ const atualizarStyle = StyleSheet.create({
     color: '#374151',
   },
   safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
-  in: { backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8 },
+  in: { backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8, width: '100%', borderWidth: 1 },
 
   footer: {
     flexDirection: 'row',
@@ -246,7 +259,17 @@ const atualizarStyle = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     backgroundColor: '#FFFFFF',
+    width: 135
   },
+
+  inputValoresServicos: {
+    height: 48,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#FFFFFF',
+  },
+
   inputFocused: {
     borderColor: '#2563EB',
     borderWidth: 2,
