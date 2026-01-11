@@ -15,7 +15,8 @@ export default {
     ios: {
       supportsTablet: true,
       infoPlist: {
-        NSLocationWhenInUseUsageDescription: "Usamos sua localização para encontrar lava-jatos próximos."
+        NSLocationWhenInUseUsageDescription: "Usamos sua localização para encontrar lava-jatos próximos.",
+        NSPhotoLibraryUsageDescription: "Precisamos acessar suas fotos para alterar sua foto de perfil"
       }
     },
     android: {

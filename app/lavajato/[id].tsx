@@ -14,6 +14,7 @@ import lavajatoStyle from './index.style';
 import { estaAberto, formatarHorario } from '@/scripts/funcoes';
 
 export default function LavaJatoDetalhes() {
+  
   const { id, distanciaKm } = useLocalSearchParams();
   const router = useRouter();
   const { height } = Dimensions.get('window');
@@ -21,40 +22,6 @@ export default function LavaJatoDetalhes() {
   const [abaAtiva, setAbaAtiva] = useState<
     'detalhes' | 'servicos' | 'veiculos' | 'horarios' | 'avaliacoes'
   >('detalhes');
-
-  // const lavaJato = {
-  //   nome: 'Lava Jato Central',
-  //   distanciaKm,
-  //   capacidade: 2,
-  //   dias: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-  //   endereco: 'Rua Pedra do Sino, 277 - Paciência, Rio de Janeiro - RJ',
-  //   horarios: {
-  //     domingo: { abertura: null, fechamento: null },
-  //     sabado: { abertura: '09:16', fechamento: '14:16' },
-  //     semana: { abertura: '09:15', fechamento: '18:15' },
-  //   },
-  //   pagamentos: ['Dinheiro', 'Pix', 'Crédito'],
-  //   servicos: [
-  //     'Lavagem Completa',
-  //     'Lavagem Interna',
-  //     'Lavagem Externa',
-  //     'Enceramento',
-  //     'Polimento',
-  //     'Delivery',
-  //     'Lavagem de Motor',
-  //   ],
-  //   valores: {
-  //     Delivery: 5,
-  //     Enceramento: 10,
-  //     'Lavagem Completa': 30,
-  //     'Lavagem Externa': 20,
-  //     'Lavagem Interna': 20,
-  //     'Lavagem de Motor': 30,
-  //     Polimento: 30,
-  //   },
-  //   veiculos: ['Sedan', 'Hatch', 'Suv', 'Picape'],
-  //   imagemUrl: require('../../assets/images/ChatGPT Image 5 de jan. de 2026, 16_53_57.png'),
-  // };
 
   const lavaJato = {
     nome: 'Lava Jato Central',
@@ -70,27 +37,20 @@ export default function LavaJatoDetalhes() {
     latitude: -22.9344176,
     longitude: -43.6361342,
     pagamentos: ["Dinheiro", "Pix", "Crédito", "Débito"],
-    servicos_adicionais: ["Lavagem Interna", "Lavagem Externa", "Enceramento", "Lavagem de Motor"],
-    tempoVeiculo: {
-      Carga: { horas: "", minutos: "" },
-      Hatch: { horas: "1", minutos: "30" },
-      Picape: { horas: "", minutos: "" },
-      SUV: { horas: "3", minutos: "00" },
-      Sedan: { horas: "2", minutos: "30" },
-      Van: { horas: "", minutos: "" }
-    },
     tipos_veiculos: ["Sedan", "Hatch", "SUV"],
-    valorlavagemcompleta: {
-      Hatch: 30,
-      SUV: 40,
-      Sedan: 30
+    tempoVeiculo: {
+      Carga: { horas: null, minutos: null, valor: null },
+      Hatch: { horas: 1, minutos: 30, valor: 60 },
+      Picape: { horas: null, minutos: null, valor: null },
+      SUV: { horas: 3, minutos: 0, valor: 50 },
+      Sedan: { horas: 2, minutos: 30, valor: 35 },
+      Van: { horas: null, minutos: null, valor: null }
     },
+    servicos_adicionais: ["Lavagem Interna", "Lavagem Externa", "Enceramento", "Lavagem de Motor"],
     valores_servicos: [
-    { servico: "Lavagem Interna", valor: 20 },
-    { servico: "Lavagem Externa", valor: 20 }, 
-    { servico: "Lavagem de Motor", valor: 10 },
-    { servico: "Enceramento", valor: 5 }, 
-    { servico: "Delivery", valor: 50 }],
+      { duracao: 90, nome: "Lavagem de Motor", valor: 50 },
+      { duracao: 30, nome: "Enceramento", valor: 20 }
+    ],
     imagemUrl: require('../../assets/images/ChatGPT Image 5 de jan. de 2026, 16_53_57.png'),
   }
 
@@ -124,10 +84,10 @@ export default function LavaJatoDetalhes() {
           <View style={lavajatoStyle.card}>
             {lavaJato.valores_servicos.map(s => (
               <View
-                key={s.servico}
+                key={s.nome}
                 style={{ flexDirection: 'row', justifyContent: 'space-between' }}
               >
-                <Text>{s.servico}</Text>
+                <Text>{s.nome}</Text>
                 <Text style={{ fontWeight: '600' }}>
                   R${s.valor}
                 </Text>

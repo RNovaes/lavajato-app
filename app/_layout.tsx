@@ -34,6 +34,7 @@ export default function RootLayout() {
           }} />
           <Stack.Screen name="lavajato/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="lavajato/agendar" options={{ headerShown: false }} />
+          <Stack.Screen name="lavajato/servicos" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

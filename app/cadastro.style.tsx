@@ -1,14 +1,20 @@
 
 import { StyleSheet } from "react-native";
+import { theme } from "@/components/theme";
 
 const cadastroStyle = StyleSheet.create({
 
-    container: {
+    safeArea: {
         flex: 1,
         backgroundColor: '#FDFDFB',
-        padding: 24,
-        justifyContent: 'center',
     },
+
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: theme.spacing.lg,
+    },
+
     titulo: {
         fontSize: 32,
         fontWeight: 'bold',

@@ -11,11 +11,11 @@ import { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import CurrencyInput from 'react-native-currency-input';
 import Geocoder from 'react-native-geocoding';
-import { Chip } from 'react-native-paper';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import atualizarStyle from './atualizarDados.style';
+import empresaStyle from './empresa.style';
+import { theme } from '@/components/theme';
 
-const BG = '#FFFFFF';
+// const BG = '#FFFFFF';
 
 export default function AtualizarDadosEmpresa() {
 
@@ -202,6 +202,7 @@ export default function AtualizarDadosEmpresa() {
     const veiculosDisponiveis = [
         "Sedan",
         "Hatch",
+        "Moto",
         "SUV",
         "Picape",
         "Van",
@@ -212,7 +213,6 @@ export default function AtualizarDadosEmpresa() {
     const [focusedInputHorario, setFocusedInputHorario] = useState<string | null>(null);
     const [capacidade, setCapacidade] = useState('');
     const [veiculos, setVeiculos] = useState<string[]>([])
-    const [valorLavagem, setValorLavagem] = useState<Record<string, number | null>>({});
     const [checkVeiculos, setcheckVeiculos] = useState(false)
 
     const toggleVeiculo = (tipo: string) => {
@@ -227,8 +227,8 @@ export default function AtualizarDadosEmpresa() {
 
     function atualizarTempo(
         veiculo: string,
-        campo: 'horas' | 'minutos',
-        valor: string
+        campo: 'horas' | 'minutos' | 'valor',
+        valor: number | null
     ) {
         setTempoVeiculo(prev => ({
             ...prev,
@@ -240,17 +240,19 @@ export default function AtualizarDadosEmpresa() {
     }
 
     type TempoValue = {
-        horas: string;
-        minutos: string;
+        horas: number | null;
+        minutos: number | null;
+        valor: number | null;
     };
 
     const [tempoVeiculo, setTempoVeiculo] = useState<Record<string, TempoValue>>({
-        Sedan: { horas: '', minutos: '' },
-        Hatch: { horas: '', minutos: '' },
-        SUV: { horas: '', minutos: '' },
-        Picape: { horas: '', minutos: '' },
-        Van: { horas: '', minutos: '' },
-        Carga: { horas: '', minutos: '' },
+        Sedan: { horas: null, minutos: null, valor: null },
+        Hatch: { horas: null, minutos: null, valor: null },
+        Moto: { horas: null, minutos: null, valor: null },
+        SUV: { horas: null, minutos: null, valor: null },
+        Picape: { horas: null, minutos: null, valor: null },
+        Van: { horas: null, minutos: null, valor: null },
+        Carga: { horas: null, minutos: null, valor: null },
     });
 
     // ============================================== ETAPA 3 ================================================================
@@ -286,47 +288,33 @@ export default function AtualizarDadosEmpresa() {
         );
     }
 
-    // function servicosValores(servico: string, valor: number | null) {
-    //     setServicosValores(prev => ({
-    //         ...prev,
-    //         [servico]: {
-    //             ...prev[servico],
-    //             valor,
-    //         },
-    //     }));
-    // }
-
-    // type Serv = {
-    //     servico: string;
-    //     valor: number | null;
-    // };
+    type ServicoSelecionado = {
+        valor: number | null
+        duracao: number | null
+    }
 
     const [servicosValores, setServicosValores] = useState<
-        Record<string, number | null>
+        Record<string, ServicoSelecionado>
     >({});
 
-
-    function atualizarServico(servico: string, valor: number | null) {
+    function atualizarServico(
+        nome: string,
+        valor: number | null,
+        duracao: number | null
+    ) {
         setServicosValores(prev => ({
             ...prev,
-            [servico]: valor,
-        }));
+            [nome]: { valor, duracao }
+        }))
     }
 
     const servicosArray = Object.entries(servicosValores).map(
-        ([servico, valor]) => ({ servico, valor })
-    );
-
-
-    // const [servicosValoresJuntos, setServicosValores] = useState<Record<string, Serv>>({
-    //     "Lavagem Interna": { servico: "Lavagem Interna", valor: null },
-    //     "Lavagem Externa": { servico: "Lavagem Externa", valor: null },
-    //     Enceramento: { servico: "Enceramento", valor: null },
-    //     Polimento: { servico: "Polimento", valor: null },
-    //     Delivery: { servico: "Delivery", valor: null },
-    //     "Lavagem de Motor": { servico: "Lavagem de Motor", valor: null },
-    // });
-
+        ([nome, dados]) => ({
+            nome,
+            valor: dados.valor,
+            duracao: dados.duracao
+        })
+    )
 
     function finalizarCadastro() {
 
@@ -352,7 +340,6 @@ export default function AtualizarDadosEmpresa() {
             capacidade: Number(capacidade),
             tipos_veiculos: veiculos,
             tempoVeiculo: tempoVeiculo,
-            valorlavagemcompleta: valorLavagem,
             servicos_adicionais: servicos,
             pagamentos: pagamentos,
             imagemUrl: require('../../assets/images/ChatGPT Image 5 de jan. de 2026, 16_53_57.png'),
@@ -371,13 +358,13 @@ export default function AtualizarDadosEmpresa() {
 
     return (
 
-        <SafeAreaView style={atualizarStyle.safeArea} edges={['top']}>
+        <SafeAreaView style={empresaStyle.safeArea} edges={['top']}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
             >
-                <ScrollView style={{ flex: 1, backgroundColor: BG }} contentContainerStyle={{ padding: 16 }} removeClippedSubviews={false} keyboardShouldPersistTaps="always"
+                <ScrollView style={{ flex: 1, backgroundColor: theme.colors.background }} contentContainerStyle={{ padding: 16 }} removeClippedSubviews={false} keyboardShouldPersistTaps="always"
                     showsVerticalScrollIndicator={false}>
                     <Stack.Screen options={{ title: 'Completar cadastro' }} />
 
@@ -397,14 +384,14 @@ export default function AtualizarDadosEmpresa() {
                             </Card>
 
                             <Card title="Horário">
-                                <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('abertura')}>
+                                <TouchableOpacity style={empresaStyle.in} onPress={() => setCampoHorario('abertura')}>
                                     <Text>
                                         {horaAbertura
                                             ? horaAbertura.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
                                             : 'Selecionar horário de abertura'}
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('fechamento')}>
+                                <TouchableOpacity style={empresaStyle.in} onPress={() => setCampoHorario('fechamento')}>
                                     <Text>
                                         {horaFechamento
                                             ? horaFechamento.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
@@ -429,14 +416,14 @@ export default function AtualizarDadosEmpresa() {
                                     {dias.includes('Sab') && (
                                         <View>
                                             <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>Sábado</Text>
-                                            <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('aberturaSabado')}>
+                                            <TouchableOpacity style={empresaStyle.in} onPress={() => setCampoHorario('aberturaSabado')}>
                                                 <Text>
                                                     {horaAberturaSabado
                                                         ? horaAberturaSabado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
                                                         : 'Selecionar horário de abertura'}
                                                 </Text>
                                             </TouchableOpacity>
-                                            <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('fechamentoSabado')}>
+                                            <TouchableOpacity style={empresaStyle.in} onPress={() => setCampoHorario('fechamentoSabado')}>
                                                 <Text>
                                                     {horaFechamentoSabado
                                                         ? horaFechamentoSabado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
@@ -448,14 +435,14 @@ export default function AtualizarDadosEmpresa() {
                                     {dias.includes('Dom') && (
                                         <View>
                                             <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>Domingo</Text>
-                                            <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('aberturaDomingo')}>
+                                            <TouchableOpacity style={empresaStyle.in} onPress={() => setCampoHorario('aberturaDomingo')}>
                                                 <Text>
                                                     {horaAberturaDomingo
                                                         ? horaAberturaDomingo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
                                                         : 'Selecionar horário de abertura'}
                                                 </Text>
                                             </TouchableOpacity>
-                                            <TouchableOpacity style={atualizarStyle.in} onPress={() => setCampoHorario('fechamentoDomingo')}>
+                                            <TouchableOpacity style={empresaStyle.in} onPress={() => setCampoHorario('fechamentoDomingo')}>
                                                 <Text>
                                                     {horaFechamentoDomingo
                                                         ? horaFechamentoDomingo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
@@ -469,27 +456,14 @@ export default function AtualizarDadosEmpresa() {
 
                             <Card title="Localização">
 
-                                {/* <TextInput
-                                    placeholder="Rua, Número, Cidade - UF"
-                                    value={endereco}
-                                    onChangeText={setEndereco}
-                                    style={[
-                                        atualizarStyle.in,
-                                        focusedLocalizacao && atualizarStyle.inputFocused,
-                                    ]}
-                                    onFocus={() => setFocusedLocalzacao(true)}
-                                    onBlur={() => setFocusedLocalzacao(false)}
-                                    maxLength={50}
-                                /> */}
-
                                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 20 }}>
                                     <TextInput
                                         placeholder="Rua / Avenida"
                                         value={rua}
                                         onChangeText={setRua}
                                         style={[
-                                            atualizarStyle.in,
-                                            focusedRua && atualizarStyle.inputFocused,
+                                            empresaStyle.in,
+                                            focusedRua && empresaStyle.inputFocused,
                                         ]}
                                         onFocus={() => setFocusedRua(true)}
                                         onBlur={() => setFocusedRua(false)}
@@ -503,7 +477,7 @@ export default function AtualizarDadosEmpresa() {
                                         keyboardType="numeric"
                                         style={[
                                             { width: '30%', backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1 },
-                                            focusedNumero && atualizarStyle.inputFocused,
+                                            focusedNumero && empresaStyle.inputFocused,
                                         ]}
                                         onFocus={() => setFocusedNumero(true)}
                                         onBlur={() => setFocusedNumero(false)}
@@ -516,7 +490,7 @@ export default function AtualizarDadosEmpresa() {
                                         onChangeText={setBairro}
                                         style={[
                                             { width: '60%', backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1 },
-                                            focusedBairro && atualizarStyle.inputFocused,
+                                            focusedBairro && empresaStyle.inputFocused,
                                         ]}
                                         onFocus={() => setFocusedBairro(true)}
                                         onBlur={() => setFocusedBairro(false)}
@@ -529,7 +503,7 @@ export default function AtualizarDadosEmpresa() {
                                         onChangeText={setCidade}
                                         style={[
                                             { width: '60%', backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1 },
-                                            focusedCidade && atualizarStyle.inputFocused,
+                                            focusedCidade && empresaStyle.inputFocused,
                                         ]}
                                         onFocus={() => setFocusedCidade(true)}
                                         onBlur={() => setFocusedCidade(false)}
@@ -544,7 +518,7 @@ export default function AtualizarDadosEmpresa() {
                                         autoCapitalize="characters"
                                         style={[
                                             { width: '30%', backgroundColor: '#FFF', borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1 },
-                                            focusedEstado && atualizarStyle.inputFocused,
+                                            focusedEstado && empresaStyle.inputFocused,
                                         ]}
                                         onFocus={() => setFocusedEstado(true)}
                                         onBlur={() => setFocusedEstado(false)}
@@ -574,9 +548,9 @@ export default function AtualizarDadosEmpresa() {
 
                                 {endereco !== "" && (
 
-                                    <View style={atualizarStyle.containerEndereco}>
+                                    <View style={empresaStyle.containerEndereco}>
                                         <Ionicons name="location-outline" size={20} color="#333" style={{ marginRight: 5 }} />
-                                        <Text style={atualizarStyle.textoEndereco}>{endereco}</Text>
+                                        <Text style={empresaStyle.textoEndereco}>{endereco}</Text>
                                     </View>
 
                                 )}
@@ -618,7 +592,7 @@ export default function AtualizarDadosEmpresa() {
                                     value={capacidade}
                                     onChangeText={setCapacidade}
                                     keyboardType="numeric"
-                                    style={[atualizarStyle.in, focused && atualizarStyle.inputFocused,]}
+                                    style={[empresaStyle.in, focused && empresaStyle.inputFocused,]}
                                     maxLength={2}
                                     onFocus={() => setFocused(true)}
                                     onBlur={() => setFocused(false)}
@@ -626,7 +600,7 @@ export default function AtualizarDadosEmpresa() {
                             </CardInfo>
 
                             <Card title="Tipos de veículos">
-                                <View style={atualizarStyle.chipContainer}>
+                                <View style={empresaStyle.chipContainer}>
 
                                     {veiculosDisponiveis.map((tipo, index) => (
 
@@ -648,39 +622,59 @@ export default function AtualizarDadosEmpresa() {
 
                                     {veiculos.map(vcl => (
 
-                                        <View key={vcl} style={atualizarStyle.tempoContainer}>
+                                        <View key={vcl} style={empresaStyle.tempoContainer}>
 
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                <Text style={atualizarStyle.tempoLabel}>{vcl}</Text>
-                                                <Text style={atualizarStyle.tempoLabel}>{'Lavagem Completa'}</Text>
+                                                <Text style={empresaStyle.tempoLabel}>{vcl}</Text>
+                                                <Text style={empresaStyle.tempoLabel}>{'Lavagem Completa'}</Text>
                                             </View>
 
-                                            <View style={atualizarStyle.tempoInputs}>
+                                            <View style={empresaStyle.tempoInputs}>
                                                 <TextInput
                                                     keyboardType="numeric"
                                                     placeholder="h"
-                                                    value={tempoVeiculo[vcl]?.horas ?? ''}
-                                                    onChangeText={text => atualizarTempo(vcl, 'horas', text)}
+                                                    value={
+                                                        tempoVeiculo[vcl]?.horas !== null
+                                                            ? String(tempoVeiculo[vcl].horas)
+                                                            : ''
+                                                    }
+                                                    onChangeText={text =>
+                                                        atualizarTempo(
+                                                            vcl,
+                                                            'horas',
+                                                            text === '' ? null : Number(text)
+                                                        )
+                                                    }
                                                     underlineColorAndroid="transparent"
                                                     style={[
-                                                        atualizarStyle.tempoInput,
-                                                        focusedInputHorario === vcl && atualizarStyle.inputFocused,
+                                                        empresaStyle.tempoInput,
+                                                        focusedInputHorario === vcl && empresaStyle.inputFocused,
                                                     ]}
                                                     onFocus={() => setFocusedInputHorario(vcl)}
                                                     onBlur={() => setFocusedInputHorario(null)}
                                                     maxLength={1}
                                                 />
 
-                                                <Text style={atualizarStyle.tempoSeparador}>:</Text>
+                                                <Text style={empresaStyle.tempoSeparador}>:</Text>
 
                                                 <TextInput
                                                     keyboardType="numeric"
                                                     placeholder="min"
-                                                    value={tempoVeiculo[vcl]?.minutos ?? ''}
-                                                    onChangeText={text => atualizarTempo(vcl, 'minutos', text)}
+                                                    value={
+                                                        tempoVeiculo[vcl]?.minutos !== null
+                                                            ? String(tempoVeiculo[vcl].minutos)
+                                                            : ''
+                                                    }
+                                                    onChangeText={text =>
+                                                        atualizarTempo(
+                                                            vcl,
+                                                            'minutos',
+                                                            text === '' ? null : Number(text)
+                                                        )
+                                                    }
                                                     style={[
-                                                        atualizarStyle.tempoInput,
-                                                        focusedInputHorario === vcl && atualizarStyle.inputFocused,
+                                                        empresaStyle.tempoInput,
+                                                        focusedInputHorario === vcl && empresaStyle.inputFocused,
                                                     ]}
                                                     onFocus={() => setFocusedInputHorario(vcl)}
                                                     onBlur={() => setFocusedInputHorario(null)}
@@ -690,13 +684,13 @@ export default function AtualizarDadosEmpresa() {
                                                 <View style={{ marginLeft: 12 }}>
                                                     <CurrencyInput
                                                         placeholder={'R$ 0,00'}
-                                                        value={valorLavagem[vcl] ?? null}
-                                                        onChangeValue={value =>
-                                                            setValorLavagem(prev => ({
-                                                                ...prev,
-                                                                [vcl]: value,
-                                                            }))
-                                                        }
+                                                        value={tempoVeiculo[vcl]?.valor !== null &&
+                                                            tempoVeiculo[vcl]?.valor !== undefined
+                                                            ? tempoVeiculo[vcl].valor
+                                                            : null}
+                                                        onChangeValue={value => {
+                                                            atualizarTempo(vcl, 'valor', value)
+                                                        }}
                                                         prefix="R$ "
                                                         delimiter="."
                                                         separator=","
@@ -704,8 +698,8 @@ export default function AtualizarDadosEmpresa() {
                                                         keyboardType="numeric"
                                                         underlineColorAndroid="transparent"
                                                         style={[
-                                                            atualizarStyle.inputValores,
-                                                            focusedInput === vcl && atualizarStyle.inputFocused,
+                                                            empresaStyle.inputValores,
+                                                            focusedInput === vcl && empresaStyle.inputFocused,
                                                         ]}
                                                         onFocus={() => setFocusedInput(vcl)}
                                                         onBlur={() => setFocusedInput(null)}
@@ -728,7 +722,7 @@ export default function AtualizarDadosEmpresa() {
                             <CardInfo title="Serviços Adicionais">
 
                                 <Infos texto='Aqui você pode informar todos os serviços adicionais que são oferecidos.'></Infos>
-                                <View style={atualizarStyle.chipContainerServicos}>
+                                <View style={empresaStyle.chipContainerServicos}>
                                     {servicosDisponiveis.map((item, index) => (
 
                                         <ChipCust
@@ -749,25 +743,62 @@ export default function AtualizarDadosEmpresa() {
                                     <Card title="Valores">
 
                                         {servicos.map(serv => (
-                                            <View key={serv} style={{ marginBottom: 12 }}>
-                                                <CurrencyInput
-                                                    placeholder={'R$ - ' + serv}
-                                                    value={servicosValores[serv] ?? null}
-                                                    onChangeValue={(value) => atualizarServico(serv, value)}
-                                                    prefix="R$ "
-                                                    delimiter="."
-                                                    separator=","
-                                                    precision={2}
+
+                                            <View key={serv} style={empresaStyle.tempoInputs}>
+                                                <TextInput
                                                     keyboardType="numeric"
+                                                    placeholder="Duração (min)"
+                                                    value={
+                                                        servicosValores[serv]?.duracao !== null &&
+                                                            servicosValores[serv]?.duracao !== undefined
+                                                            ? String(servicosValores[serv].duracao)
+                                                            : ''
+                                                    }
+                                                    onChangeText={text => {
+                                                        const duracao = text === '' ? null : Number(text)
+                                                        atualizarServico(serv, servicosValores[serv]?.valor ?? null, duracao)
+                                                    }}
+                                                    underlineColorAndroid="transparent"
                                                     style={[
-                                                        atualizarStyle.inputValoresServicos,
-                                                        focusedInput === serv && atualizarStyle.inputFocused,
+                                                        empresaStyle.tempoInput,
+                                                        focusedInputHorario === serv && empresaStyle.inputFocused,
                                                     ]}
+                                                    onFocus={() => setFocusedInputHorario(serv)}
+                                                    onBlur={() => setFocusedInputHorario(null)}
+                                                    maxLength={2}
                                                 />
+
+                                                <View style={{ marginBottom: 12 }}>
+                                                    <CurrencyInput
+                                                        placeholder={'R$ - ' + serv}
+                                                        value={
+                                                            servicosValores[serv]?.valor !== null &&
+                                                                servicosValores[serv]?.valor !== undefined
+                                                                ? servicosValores[serv].valor
+                                                                : null
+                                                        }
+                                                        onChangeValue={valor => {
+                                                            atualizarServico(
+                                                                serv,
+                                                                valor,
+                                                                servicosValores[serv]?.duracao ?? null
+                                                            )
+                                                        }}
+                                                        prefix="R$ "
+                                                        delimiter="."
+                                                        separator=","
+                                                        precision={2}
+                                                        keyboardType="numeric"
+                                                        style={[
+                                                            empresaStyle.inputValoresServicos,
+                                                            focusedInput === serv && empresaStyle.inputFocused,
+                                                        ]}
+                                                    />
+                                                </View>
                                             </View>
                                         ))
                                         }
-                                    </Card>
+                                    </Card >
 
                                     <Text style={{ fontSize: 8 }}>Os valores informados acima, são referentes para todos os tipos de veiculos aceitos, caso os valores de serviços adicionais sejam diferentes
                                         para cada tipo de veículo, após o cadastro, procure no menu de serviços por "alterar valores", marque a caixa "valores diferentes por tipo de veículos" e informe os valores corretos.</Text>
@@ -776,7 +807,7 @@ export default function AtualizarDadosEmpresa() {
 
                             <Card title="Formas de Pagamento">
 
-                                <View style={atualizarStyle.chipContainer}>
+                                <View style={empresaStyle.chipContainer}>
                                     {['Dinheiro', 'Pix', 'Crédito', 'Débito'].map(item => (
                                         <ChipCust
                                             key={item}
@@ -792,13 +823,15 @@ export default function AtualizarDadosEmpresa() {
                         </>
                     )}
 
+
                     <View style={[
-                        atualizarStyle.footer,
-                        { paddingBottom: insets.bottom + 12 },
+                        empresaStyle.footer,
+                        { paddingBottom: insets.bottom },
                     ]}>
                         {step > 1 && <SecondaryButton label="Voltar" onPress={() => setStep(step - 1)} />}
                         <PrimaryButton label={step === 3 ? 'Finalizar cadastro' : 'Continuar'} onPress={() => step === 3 ? finalizarCadastro() : setStep(step + 1)} />
                     </View>
+
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView >

@@ -1,15 +1,16 @@
 
-import atualizarStyle from '@/app/empresa/atualizarDados.style';
+import atualizarStyle from '@/app/empresa/empresa.style';
 import { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { IconButton, Modal, Portal } from 'react-native-paper';
+import { theme } from './theme';
 
-const CARD = '#F9FAFB';
+// const CARD = '#F9FAFB';
 const PRIMARY = '#2563EB';
 
 export function Card({ title, children }: any) {
     return (
-        <View style={{ backgroundColor: CARD, borderRadius: 12, padding: 16, marginTop: 16 }}>
+        <View style={{ backgroundColor: theme.colors.card, borderRadius: 12, padding: 16, marginTop: 16 }}>
             <Text style={{ fontWeight: '600', marginBottom: 12 }}>{title}</Text>
             {children}
         </View>
@@ -18,7 +19,7 @@ export function Card({ title, children }: any) {
 
 export function CardInfo({ title, children }: any) {
     return (
-        <View style={{ backgroundColor: CARD, borderRadius: 12, padding: 16, marginTop: 16, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
+        <View style={{ backgroundColor: theme.colors.card, borderRadius: 12, padding: 16, marginTop: 16, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
             <Text style={{ fontWeight: '600', marginBottom: 12 }}>{title}</Text>
             {children}
         </View>

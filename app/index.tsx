@@ -13,15 +13,15 @@ export default function paginaInicial() {
     const emailInputRef = useRef(initialRef);
     const senhaInputRef = useRef(initialRef);
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const timeout = setTimeout(() => {
-                emailInputRef.current?.focus();
-            }, 100);
+    // useFocusEffect(
+    //     React.useCallback(() => {
+    //         const timeout = setTimeout(() => {
+    //             emailInputRef.current?.focus();
+    //         }, 100);
 
-            return () => clearTimeout(timeout);
-        }, [])
-    );
+    //         return () => clearTimeout(timeout);
+    //     }, [])
+    // );
 
     const router = useRouter()
 

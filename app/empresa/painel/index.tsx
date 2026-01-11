@@ -1,13 +1,57 @@
 
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Image, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'
-import painelStyle from './index.style';
-import { useRouter } from 'expo-router';
+import painelStyle from './estilos/index.style';
+import { Href, useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function PainelDono() {
 
   const rota = useRouter()
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [fotoPerfil, setFotoPerfil] = useState(require('../../../assets/images/ChatGPT Image 5 de jan. de 2026, 16_53_57.png'));
+  //'https://via.placeholder.com/150'
+
+  async function tirarFoto() {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') return;
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setFotoPerfil(result.assets[0].uri);
+      setModalVisible(false);
+    }
+  }
+
+  async function escolherGaleria() {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setFotoPerfil(result.assets[0].uri);
+      setModalVisible(false);
+    }
+  }
+
+  const menuItems: { label: string, rota: Href }[] = [
+    { label: 'Meus dados', rota: '/empresa/painel/perfil' as Href },
+    { label: 'Agendamentos', rota: '/empresa/painel/agendamentos' as Href },
+    { label: 'Faturamento', rota: '/empresa/painel/faturamento' as Href},
+    { label: 'Serviços oferecidos', rota: '/empresa/painel/servicos' as Href},
+    { label: 'Avaliações', rota: '/empresa/painel/avaliacoes' as Href},
+  ];
+
   return (
 
     <SafeAreaView style={painelStyle.safeArea} edges={['top']}>
@@ -15,9 +59,22 @@ export default function PainelDono() {
 
         {/* HEADER */}
         <View style={painelStyle.header}>
-          <Text style={painelStyle.hello}>Olá, João 👋</Text>
-          <Text style={painelStyle.sub}>Lava Jato Brilho Rápido</Text>
+
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <View style={painelStyle.avatarWrapper}>
+              <Image source={fotoPerfil} style={painelStyle.avatar} />
+              <View style={painelStyle.cameraIcon}>
+                <Ionicons name="camera" size={12} color="#FFF" />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <View style={painelStyle.headerRight}>
+            <Text style={painelStyle.hello}>Olá, João 👋</Text>
+            <Text style={painelStyle.sub}>Lava Jato Brilho Rápido</Text>
+          </View>
         </View>
+
 
         {/* ALERTA */}
         <View style={painelStyle.alert}>
@@ -25,7 +82,7 @@ export default function PainelDono() {
           <Text style={painelStyle.alertText}>
             Seus dados estão incompletos. Atualize para usar todas as funções.
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity style={painelStyle.atualizarDados} onPress={() => rota.push('/empresa/atualizarDados')}>
             <Text style={painelStyle.alertLink}>Atualizar agora</Text>
           </TouchableOpacity>
         </View>
@@ -54,7 +111,7 @@ export default function PainelDono() {
         </View>
 
         {/* CTA */}
-        <TouchableOpacity style={painelStyle.primaryButton} onPress={() => rota.push('../lavajato/agendar')}>
+        <TouchableOpacity style={painelStyle.primaryButton} onPress={() => rota.push('../lavajato/servicos')}>
           <Text style={painelStyle.primaryButtonText}>Novo agendamento</Text>
         </TouchableOpacity>
 
@@ -62,18 +119,17 @@ export default function PainelDono() {
         <View style={painelStyle.section}>
           <Text style={painelStyle.sectionTitle}>Gestão</Text>
 
-          {[
-            'Meus dados',
-            'Agendamentos',
-            'Faturamento',
-            'Serviços oferecidos',
-            'Avaliações'
-          ].map((item, index) => (
-            <TouchableOpacity key={index} style={painelStyle.listItem}>
-              <Text style={painelStyle.listText}>{item}</Text>
+          {menuItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={painelStyle.listItem}
+              onPress={() => rota.push(item.rota)} // Use a rota específica do item
+            >
+              <Text style={painelStyle.listText}>{item.label}</Text>
               <Text style={painelStyle.arrow}>›</Text>
             </TouchableOpacity>
           ))}
+
         </View>
 
         {/* CONTA */}
@@ -87,6 +143,38 @@ export default function PainelDono() {
       </View> */}
 
       </ScrollView>
+
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={painelStyle.modalOverlay}>
+          <View style={painelStyle.modalContent}>
+            <Text style={painelStyle.modalTitle}>Alterar foto</Text>
+
+            <TouchableOpacity
+              style={painelStyle.modalButton}
+              onPress={tirarFoto}
+            >
+              <Text style={painelStyle.modalButtonText}>Tirar foto</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={painelStyle.modalButton}
+              onPress={escolherGaleria}
+            >
+              <Text style={painelStyle.modalButtonText}>Escolher da galeria</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={painelStyle.modalCancel}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 }

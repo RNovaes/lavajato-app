@@ -1,0 +1,14 @@
+
+- Meus Dados.
+    # - Colocar eye no reset de senha.
+    # - Validar o telefone e nome antes de alterar
+    # - Colocar focus nos inputs
+
+- Cadastro
+    - Incluir Telefone e as validações
+    - Ajustar keyboardAvoid
+
+- Painel Empresa
+    - Fazer página Agendamentos
+    - Fazer página serviços oferecidos
+    - Fazer página de avaliações

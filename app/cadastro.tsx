@@ -1,20 +1,22 @@
 
-import { View, Text, TouchableOpacity, Vibration } from 'react-native';
+import { View, Text, TouchableOpacity, Vibration, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cadastroStyle from './cadastro.style';
 import { useFocusEffect } from '@react-navigation/native';
 import MeuTextInput from '@/components/MeuTextInput';
 import { Ionicons } from '@expo/vector-icons';
 import { SegmentedButtons, Checkbox } from 'react-native-paper';
-import { maskCNPJ, maskCPF } from '@/scripts/mascaras';
-
+import { maskCNPJ, maskCPF, maskTelefone } from '@/scripts/mascaras';
+import { validarCpfCnpj, validarTelefone } from '@/scripts/funcoes';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Cadastro() {
 
     const initialRef: any = null;
     const nomeInputRef = useRef(initialRef);
     const emailnputRef = useRef(initialRef);
+    const telefonelnputRef = useRef(initialRef);
     const senhaInputRef = useRef(initialRef);
     const cnpjInputRef = useRef(initialRef);
     const cpfInputRef = useRef(initialRef);
@@ -33,11 +35,13 @@ export default function Cadastro() {
     //Dados Cliente
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
+    const [telefone, setTelefone] = useState('');
     const [senha, setSenha] = useState('');
 
     //Mensagens de Erro Cliente
     const [mensagemErroNome, setmensagemErroNome] = useState('');
     const [mensagemErroEmail, setmensagemErroEmail] = useState('');
+    const [mensagemErroTelefone, setmensagemErroTelefone] = useState('');
     const [mensagemErroSenha, setmensagemErroSenha] = useState('');
 
     //Dados Empresa
@@ -53,6 +57,7 @@ export default function Cadastro() {
     const [mensagemErroSenhaEmpresa, setmensagemErroSenhaEmpresa] = useState('');
     const [mensagemErroCpf, setmensagemErroCpf] = useState('');
     const [mensagemErroCnpj, setmensagemErroCnpj] = useState('');
+    const [mensagemErroCnpjCpf, setmensagemErroCnpjCpf] = useState('');
 
     //Foco nos inputs
     useFocusEffect(
@@ -72,11 +77,48 @@ export default function Cadastro() {
         }, [tipo, temCnpj])
     );
 
+    useEffect(() => {
+
+        if (tipo === 'usuario') {
+            
+            setCnpj('');
+            setCpf('');
+            setnomeEmpresa('');
+            setEmailEmpresa('');
+            setSenhaEmpresa('');
+            setmensagemErronomeEmpresa('');
+            setmensagemErroEmailEmpresa('');
+            setmensagemErroSenhaEmpresa('');
+            setmensagemErroCpf('');
+            setmensagemErroCnpj('');
+            setmensagemErroCnpjCpf('');
+        }
+
+        if (tipo === 'comercio') {
+
+            setNome('');
+            setEmail('');
+            setTelefone('');
+            setSenha('');
+            setmensagemErroNome('');
+            setmensagemErroEmail('');
+            setmensagemErroTelefone('');
+            setmensagemErroSenha('');
+
+            if (temCnpj){
+                setCpf('')
+            }else{
+                setCnpj('')
+            }
+        }
+    }, [tipo, temCnpj]);
+
     const validarCamposUsuario = () => {
 
         let error = false
         setmensagemErroNome('')
         setmensagemErroEmail('')
+        setmensagemErroTelefone('')
         setmensagemErroSenha('')
 
         if (nome == '' || nome.length < 3 || nome.length > 50) {
@@ -93,12 +135,21 @@ export default function Cadastro() {
             emailnputRef.current.focus();
             error = true
         }
+
+        if (!validarTelefone(telefone)) {
+            Vibration.vibrate()
+            setmensagemErroTelefone("Número de telefone inválido")
+            telefonelnputRef.current.focus();
+            error = true
+        }
+
         if (senha == '' || senha.length < 6) {
             Vibration.vibrate()
             setmensagemErroSenha("Mínimo de 6 Caracteres")
             senhaInputRef.current.focus();
             error = true
         }
+
         if (senha.length > 18) {
             Vibration.vibrate()
             setmensagemErroSenha("Máximo de 18 Caracteres")
@@ -123,25 +174,6 @@ export default function Cadastro() {
             error = true
         }
 
-        if (cpf == '' && cnpj == '') {
-            Vibration.vibrate()
-            setmensagemErroCpf("Cpf ou Cnpj precisam ser incluídos!")
-            setmensagemErroCnpj("Cnpj ou Cpf precisam ser incluídos!")
-            error = true
-        }
-
-        if (cpf && cpf.length < 14) {
-            Vibration.vibrate()
-            setmensagemErroCpf("Preencha o Campo Cpf Corretamente")
-            error = true
-        }
-
-        if (cnpj && cnpj.length < 18) {
-            Vibration.vibrate()
-            setmensagemErroCnpj("Preencha o Campo Cnpj Corretamente")
-            error = true
-        }
-
         const regE = /\S+@\S+\.\S+/;
         if (!regE.test(String(emailEmpresa).toLowerCase())) {
             Vibration.vibrate()
@@ -160,6 +192,12 @@ export default function Cadastro() {
             setmensagemErroSenhaEmpresa("Máximo de 18 Caracteres")
             error = true
         }
+
+        if (!validarCpfCnpj(cpf || cnpj)) {
+            Vibration.vibrate()
+            setmensagemErroCnpjCpf("Erro, CPF ou CNPJ inválido")
+            error = true
+        }
         return !error
     }
 
@@ -169,6 +207,7 @@ export default function Cadastro() {
             let data = {
                 nome: nome,
                 email: email,
+                telefone: telefone,
                 senha: senha
             }
 
@@ -195,189 +234,206 @@ export default function Cadastro() {
 
     return (
 
-        <View style={cadastroStyle.container}>
+        <SafeAreaView style={cadastroStyle.safeArea} edges={['top']}>
 
-            <Text style={cadastroStyle.titulo}>Cadastro</Text>
+            <ScrollView contentContainerStyle={cadastroStyle.container}>
 
-            <SegmentedButtons
-                value={tipo}
-                onValueChange={setTipo}
-                buttons={[
-                    {
-                        value: 'usuario', label: 'Usuário', style: [
-                            tipo === 'usuario' && cadastroStyle.botaoSelecionado
-                        ],
-                        labelStyle: tipo === 'usuario' ? cadastroStyle.textoSelecionado : cadastroStyle.textoNormal
-                    },
-                    {
-                        value: 'comercio', label: 'Loja', style: [
-                            tipo === 'comercio' && cadastroStyle.botaoSelecionado
-                        ],
-                        labelStyle: tipo === 'comercio' ? cadastroStyle.textoSelecionado : cadastroStyle.textoNormal
-                    },
-                ]}
-                style={{ margin: 16 }}
-            />
+                <Text style={cadastroStyle.titulo}>Cadastro</Text>
 
-            {tipo === 'usuario' ? (
+                <SegmentedButtons
+                    value={tipo}
+                    onValueChange={setTipo}
+                    buttons={[
+                        {
+                            value: 'usuario', label: 'Usuário', style: [
+                                tipo === 'usuario' && cadastroStyle.botaoSelecionado
+                            ],
+                            labelStyle: tipo === 'usuario' ? cadastroStyle.textoSelecionado : cadastroStyle.textoNormal
+                        },
+                        {
+                            value: 'comercio', label: 'Loja', style: [
+                                tipo === 'comercio' && cadastroStyle.botaoSelecionado
+                            ],
+                            labelStyle: tipo === 'comercio' ? cadastroStyle.textoSelecionado : cadastroStyle.textoNormal
+                        },
+                    ]}
+                    style={{ margin: 16 }}
+                />
 
-                <>
+                {tipo === 'usuario' ? (
 
-                    {mensagemErroNome && <Text style={cadastroStyle.mensagemErro}>{mensagemErroNome}</Text>}
-                    <MeuTextInput
-                        ref={nomeInputRef}
-                        label="Nome"
-                        style={cadastroStyle.input}
-                        maxLength={50}
-                        onChangeText={text => {
-                            setNome(text)
-                            setmensagemErroNome('')
-                        }}
-                    />
-
-                    {mensagemErroEmail && <Text style={cadastroStyle.mensagemErro}>{mensagemErroEmail}</Text>}
-                    <MeuTextInput
-                        ref={emailnputRef}
-                        label="Email"
-                        style={cadastroStyle.input}
-                        maxLength={50}
-                        value={email}
-                        onChangeText={text => {
-                            setEmail(text)
-                            setmensagemErroEmail('')
-                        }}
-                    />
-
-                    {mensagemErroSenha && <Text style={cadastroStyle.mensagemErro}>{mensagemErroSenha}</Text>}
-                    <View>
+                    <>
+                        {mensagemErroNome && <Text style={cadastroStyle.mensagemErro}>{mensagemErroNome}</Text>}
                         <MeuTextInput
-                            ref={senhaInputRef}
-                            label="Senha"
-                            secureTextEntry={esconderSenha}
+                            ref={nomeInputRef}
+                            label="Nome"
                             style={cadastroStyle.input}
-                            maxLength={18}
+                            maxLength={50}
                             onChangeText={text => {
-                                setSenha(text)
-                                setmensagemErroSenha('')
+                                setNome(text)
+                                setmensagemErroNome('')
                             }}
                         />
-                        <TouchableOpacity onPress={() => setMostrarSenha(!esconderSenha)} style={cadastroStyle.icone}>
-                            <Ionicons
-                                name={esconderSenha ? 'eye-off' : 'eye'}
-                                size={24}
-                                color="#6B7280"
-                            />
-                        </TouchableOpacity>
-                    </View>
 
-                    <TouchableOpacity onPress={() => cadastrarUsuario()} style={cadastroStyle.botaoSecundario}>
-                        <Text style={cadastroStyle.textoBotaoSecundario}>Cadastrar</Text>
-                    </TouchableOpacity>
-
-                </>
-            ) : (
-                <>
-                    <View style={cadastroStyle.checkboxContainer}>
-                        <Checkbox
-                            status={temCnpj ? 'checked' : 'unchecked'}
-                            onPress={toggleCnpj}
-                        />
-                        <Text onPress={toggleCnpj} style={cadastroStyle.checkboxLabel}>
-                            Possui CNPJ?
-                        </Text>
-                    </View>
-
-                    {temCnpj ? (
-                        <View>
-                            {mensagemErroCnpj && <Text style={cadastroStyle.mensagemErro}>{mensagemErroCnpj}</Text>}
-                            <MeuTextInput
-                                label="Cnpj"
-                                style={cadastroStyle.input}
-                                ref={cnpjInputRef}
-                                value={cnpj}
-                                onChangeText={text => {
-                                    setCnpj(maskCNPJ(text))
-                                    setmensagemErroCnpj('')
-                                }}
-                                keyboardType="numeric"
-                            />
-                        </View>
-                    ) : (
-                        <View>
-                            {mensagemErroCpf && <Text style={cadastroStyle.mensagemErro}>{mensagemErroCpf}</Text>}
-                            <MeuTextInput
-                                label="Cpf"
-                                style={cadastroStyle.input}
-                                ref={cpfInputRef}
-                                value={cpf}
-                                onChangeText={text => {
-                                    setCpf(maskCPF(text))
-                                    setmensagemErroCpf('')
-                                }}
-                                keyboardType="numeric"
-                            />
-                        </View>
-                    )}
-
-                    {mensagemErronomeEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErronomeEmpresa}</Text>}
-                    <MeuTextInput
-                        ref={nomeEmpresaInputRef}
-                        label="Nome do Estabelecimento"
-                        style={cadastroStyle.input}
-                        maxLength={100}
-                        value={nomeEmpresa}
-                        onChangeText={text => {
-                            setnomeEmpresa(text)
-                            setmensagemErronomeEmpresa('')
-                        }}
-                    />
-
-                    {mensagemErroEmailEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErroEmailEmpresa}</Text>}
-                    <MeuTextInput
-                        ref={emailEmpresaInputRef}
-                        label="Email"
-                        style={cadastroStyle.input}
-                        maxLength={50}
-                        value={emailEmpresa}
-                        onChangeText={text => {
-                            setEmailEmpresa(text)
-                            setmensagemErroEmailEmpresa('')
-                        }}
-                    />
-
-                    {mensagemErroSenhaEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErroSenhaEmpresa}</Text>}
-                    <View>
+                        {mensagemErroEmail && <Text style={cadastroStyle.mensagemErro}>{mensagemErroEmail}</Text>}
                         <MeuTextInput
-                            ref={senhaEmpresaInputRef}
-                            label="Senha"
-                            secureTextEntry={esconderSenha}
+                            ref={emailnputRef}
+                            label="Email"
                             style={cadastroStyle.input}
-                            maxLength={18}
-                            value={senhaEmpresa}
+                            maxLength={50}
+                            value={email}
                             onChangeText={text => {
-                                setSenhaEmpresa(text)
-                                setmensagemErroSenhaEmpresa('')
+                                setEmail(text)
+                                setmensagemErroEmail('')
                             }}
                         />
-                        <TouchableOpacity onPress={() => setMostrarSenha(!esconderSenha)} style={cadastroStyle.icone}>
-                            <Ionicons
-                                name={esconderSenha ? 'eye-off' : 'eye'}
-                                size={24}
-                                color="#6B7280"
+
+                        {mensagemErroTelefone && <Text style={cadastroStyle.mensagemErro}>{mensagemErroTelefone}</Text>}
+                        <MeuTextInput
+                            ref={telefonelnputRef}
+                            style={cadastroStyle.input}
+                            label="Telefone"
+                            value={telefone}
+                            onChangeText={text => {
+                                setTelefone(maskTelefone(text))
+                                setmensagemErroTelefone('')
+                            }}
+                            keyboardType="phone-pad"
+                        />
+
+                        {mensagemErroSenha && <Text style={cadastroStyle.mensagemErro}>{mensagemErroSenha}</Text>}
+                        <View>
+                            <MeuTextInput
+                                ref={senhaInputRef}
+                                label="Senha"
+                                secureTextEntry={esconderSenha}
+                                style={cadastroStyle.input}
+                                maxLength={18}
+                                onChangeText={text => {
+                                    setSenha(text)
+                                    setmensagemErroSenha('')
+                                }}
                             />
+                            <TouchableOpacity onPress={() => setMostrarSenha(!esconderSenha)} style={cadastroStyle.icone}>
+                                <Ionicons
+                                    name={esconderSenha ? 'eye-off' : 'eye'}
+                                    size={24}
+                                    color="#6B7280"
+                                />
+                            </TouchableOpacity>
+                        </View>
+
+                        <TouchableOpacity onPress={() => cadastrarUsuario()} style={cadastroStyle.botaoSecundario}>
+                            <Text style={cadastroStyle.textoBotaoSecundario}>Cadastrar</Text>
                         </TouchableOpacity>
-                    </View>
 
-                    <TouchableOpacity onPress={() => cadastrarEmpresa()} style={cadastroStyle.botaoSecundario}>
-                        <Text style={cadastroStyle.textoBotaoSecundario}>Cadastrar</Text>
-                    </TouchableOpacity>
+                    </>
+                ) : (
+                    <>
+                        <View style={cadastroStyle.checkboxContainer}>
+                            <Checkbox
+                                status={temCnpj ? 'checked' : 'unchecked'}
+                                onPress={toggleCnpj}
+                            />
+                            <Text onPress={toggleCnpj} style={cadastroStyle.checkboxLabel}>
+                                Possui CNPJ?
+                            </Text>
+                        </View>
 
-                </>
-            )}
+                        {temCnpj ? (
+                            <View>
+                                {mensagemErroCnpj && <Text style={cadastroStyle.mensagemErro}>{mensagemErroCnpj}</Text>}
+                                {mensagemErroCnpjCpf && <Text style={cadastroStyle.mensagemErro}>{mensagemErroCnpjCpf}</Text>}
+                                <MeuTextInput
+                                    label="Cnpj"
+                                    style={cadastroStyle.input}
+                                    ref={cnpjInputRef}
+                                    value={cnpj}
+                                    onChangeText={text => {
+                                        setCnpj(maskCNPJ(text))
+                                        setmensagemErroCnpj('')
+                                    }}
+                                    keyboardType="numeric"
+                                />
+                            </View>
+                        ) : (
+                            <View>
+                                {mensagemErroCpf && <Text style={cadastroStyle.mensagemErro}>{mensagemErroCpf}</Text>}
+                                {mensagemErroCnpjCpf && <Text style={cadastroStyle.mensagemErro}>{mensagemErroCnpjCpf}</Text>}
+                                <MeuTextInput
+                                    label="Cpf"
+                                    style={cadastroStyle.input}
+                                    ref={cpfInputRef}
+                                    value={cpf}
+                                    onChangeText={text => {
+                                        setCpf(maskCPF(text))
+                                        setmensagemErroCpf('')
+                                    }}
+                                    keyboardType="numeric"
+                                />
+                            </View>
+                        )}
 
-            <TouchableOpacity onPress={() => router.replace('/')} style={cadastroStyle.dividir}>
-                <Text style={cadastroStyle.esqueciSenha}>Já tem uma conta? Entrar</Text>
-            </TouchableOpacity>
-        </View>
+                        {mensagemErronomeEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErronomeEmpresa}</Text>}
+                        <MeuTextInput
+                            ref={nomeEmpresaInputRef}
+                            label="Nome do Estabelecimento"
+                            style={cadastroStyle.input}
+                            maxLength={100}
+                            value={nomeEmpresa}
+                            onChangeText={text => {
+                                setnomeEmpresa(text)
+                                setmensagemErronomeEmpresa('')
+                            }}
+                        />
+
+                        {mensagemErroEmailEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErroEmailEmpresa}</Text>}
+                        <MeuTextInput
+                            ref={emailEmpresaInputRef}
+                            label="Email"
+                            style={cadastroStyle.input}
+                            maxLength={50}
+                            value={emailEmpresa}
+                            onChangeText={text => {
+                                setEmailEmpresa(text)
+                                setmensagemErroEmailEmpresa('')
+                            }}
+                        />
+
+                        {mensagemErroSenhaEmpresa && <Text style={cadastroStyle.mensagemErro}>{mensagemErroSenhaEmpresa}</Text>}
+                        <View>
+                            <MeuTextInput
+                                ref={senhaEmpresaInputRef}
+                                label="Senha"
+                                secureTextEntry={esconderSenha}
+                                style={cadastroStyle.input}
+                                maxLength={18}
+                                value={senhaEmpresa}
+                                onChangeText={text => {
+                                    setSenhaEmpresa(text)
+                                    setmensagemErroSenhaEmpresa('')
+                                }}
+                            />
+                            <TouchableOpacity onPress={() => setMostrarSenha(!esconderSenha)} style={cadastroStyle.icone}>
+                                <Ionicons
+                                    name={esconderSenha ? 'eye-off' : 'eye'}
+                                    size={24}
+                                    color="#6B7280"
+                                />
+                            </TouchableOpacity>
+                        </View>
+
+                        <TouchableOpacity onPress={() => cadastrarEmpresa()} style={cadastroStyle.botaoSecundario}>
+                            <Text style={cadastroStyle.textoBotaoSecundario}>Cadastrar</Text>
+                        </TouchableOpacity>
+
+                    </>
+                )}
+
+                <TouchableOpacity onPress={() => router.replace('/')} style={cadastroStyle.dividir}>
+                    <Text style={cadastroStyle.esqueciSenha}>Já tem uma conta? Entrar</Text>
+                </TouchableOpacity>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
