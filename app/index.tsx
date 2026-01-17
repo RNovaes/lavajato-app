@@ -67,8 +67,8 @@ export default function paginaInicial() {
             if (tipo == 1) {
                 router.replace("/empresa")
             }else{
-                // router.replace("/cliente")
-                router.replace(`/lavajato/${id}`)
+                router.replace("/cliente")
+                // router.replace(`/lavajato/${id}`)
             }
         }
     }

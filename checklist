@@ -12,3 +12,18 @@
     - Fazer página Agendamentos
     - Fazer página serviços oferecidos
     - Fazer página de avaliações
+
+- Pagina Lavajato [id]
+    # - Remover o Delivery para agendamento
+
+- Página de Agendar
+    - Ajustar botao de Confirmar para sair de baixo dos botoes do android
+    - Ajustar as views que se sobrepoe dependendo do dia
+
+- Página de Atualizar Dados
+    - Perguntar sobre a estrutura
+    - Perguntar sobre as regras
+
+- Pagina Theme
+    - Deixar apenas referente a valores de cores
+    - Ajustar todas as outras páginas que darão erro

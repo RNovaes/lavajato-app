@@ -1,7 +1,9 @@
 
 
 export const theme = {
+  
   colors: {
+
     background: '#F8F9FB',   // fundo geral (off-white)
     card: '#FFFFFF',         // cards
     border: '#E5E7EB',
@@ -39,16 +41,10 @@ export const theme = {
   fontSize: {
     xs: 12,
     sm: 13,
-    md: 15,
+    md: 16,
     lg: 18,
     xl: 22,
     xxl: 26,
   },
 
-  fontWeight: {
-    regular: '400',
-    medium: '500',
-    semibold: '600',
-    bold: '700',
-  },
 };

@@ -291,6 +291,7 @@ export default function AtualizarDadosEmpresa() {
     type ServicoSelecionado = {
         valor: number | null
         duracao: number | null
+        permiteExtras: boolean
     }
 
     const [servicosValores, setServicosValores] = useState<
@@ -300,11 +301,12 @@ export default function AtualizarDadosEmpresa() {
     function atualizarServico(
         nome: string,
         valor: number | null,
-        duracao: number | null
+        duracao: number | null,
+        permiteExtras: boolean
     ) {
         setServicosValores(prev => ({
             ...prev,
-            [nome]: { valor, duracao }
+            [nome]: { valor, duracao, permiteExtras }
         }))
     }
 
@@ -312,7 +314,8 @@ export default function AtualizarDadosEmpresa() {
         ([nome, dados]) => ({
             nome,
             valor: dados.valor,
-            duracao: dados.duracao
+            duracao: dados.duracao,
+            permiteExtras: dados.permiteExtras
         })
     )
 
@@ -343,7 +346,7 @@ export default function AtualizarDadosEmpresa() {
             servicos_adicionais: servicos,
             pagamentos: pagamentos,
             imagemUrl: require('../../assets/images/ChatGPT Image 5 de jan. de 2026, 16_53_57.png'),
-            valores_servicos: servicosArray
+            detalhesServicos: servicosArray
         }
         console.log(dados)
 
@@ -756,7 +759,7 @@ export default function AtualizarDadosEmpresa() {
                                                     }
                                                     onChangeText={text => {
                                                         const duracao = text === '' ? null : Number(text)
-                                                        atualizarServico(serv, servicosValores[serv]?.valor ?? null, duracao)
+                                                        atualizarServico(serv, servicosValores[serv]?.valor ?? null, duracao, serv === 'Delivery' ? false : true)
                                                     }}
                                                     underlineColorAndroid="transparent"
                                                     style={[
@@ -781,7 +784,8 @@ export default function AtualizarDadosEmpresa() {
                                                             atualizarServico(
                                                                 serv,
                                                                 valor,
-                                                                servicosValores[serv]?.duracao ?? null
+                                                                servicosValores[serv]?.duracao ?? null,
+                                                                serv === 'Delivery' ? false : true
                                                             )
                                                         }}
                                                         prefix="R$ "
