@@ -15,34 +15,34 @@ export default function PainelDono() {
   const [fotoPerfil, setFotoPerfil] = useState(require('../../../assets/images/ChatGPT Image 5 de jan. de 2026, 16_53_57.png'));
   //'https://via.placeholder.com/150'
 
-  async function tirarFoto() {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') return;
+  // async function tirarFoto() {
+  //   const { status } = await ImagePicker.requestCameraPermissionsAsync();
+  //   if (status !== 'granted') return;
 
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
+  //   const result = await ImagePicker.launchCameraAsync({
+  //     allowsEditing: true,
+  //     aspect: [1, 1],
+  //     quality: 0.7,
+  //   });
 
-    if (!result.canceled) {
-      setFotoPerfil(result.assets[0].uri);
-      setModalVisible(false);
-    }
-  }
+  //   if (!result.canceled) {
+  //     setFotoPerfil(result.assets[0].uri);
+  //     setModalVisible(false);
+  //   }
+  // }
 
-  async function escolherGaleria() {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
+  // async function escolherGaleria() {
+  //   const result = await ImagePicker.launchImageLibraryAsync({
+  //     allowsEditing: true,
+  //     aspect: [1, 1],
+  //     quality: 0.7,
+  //   });
 
-    if (!result.canceled) {
-      setFotoPerfil(result.assets[0].uri);
-      setModalVisible(false);
-    }
-  }
+  //   if (!result.canceled) {
+  //     setFotoPerfil(result.assets[0].uri);
+  //     setModalVisible(false);
+  //   }
+  // }
 
   const menuItems: { label: string, rota: Href }[] = [
     { label: 'Meus dados', rota: '/empresa/painel/perfil' as Href },
@@ -57,7 +57,6 @@ export default function PainelDono() {
     <SafeAreaView style={painelStyle.safeArea} edges={['top']}>
       <ScrollView style={painelStyle.container} contentContainerStyle={{ paddingBottom: 24 }}>
 
-        {/* HEADER */}
         <View style={painelStyle.header}>
 
           <TouchableOpacity onPress={() => setModalVisible(true)}>
@@ -132,19 +131,9 @@ export default function PainelDono() {
 
         </View>
 
-        {/* CONTA */}
-        {/* <View style={painelStyle.accountSection}>
-        <TouchableOpacity>
-          <Text style={painelStyle.logout}>Sair da conta</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={painelStyle.delete}>Remover conta</Text>
-        </TouchableOpacity>
-      </View> */}
-
       </ScrollView>
 
-      <Modal
+      {/* <Modal
         visible={modalVisible}
         transparent
         animationType="fade"
@@ -173,7 +162,7 @@ export default function PainelDono() {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
 
     </SafeAreaView>
   );

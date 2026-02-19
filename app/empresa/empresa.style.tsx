@@ -64,16 +64,16 @@ const empresaStyle = StyleSheet.create({
   },
 
   chip: {
-    paddingHorizontal: theme.spacing.mdd,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.radius.lg,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
 
     backgroundColor: theme.colors.card,
     borderWidth: 1,
     borderColor: theme.colors.border,
 
-    marginRight: theme.spacing.sm,
-    marginBottom: theme.spacing.sm,
+    marginRight: 8,
+    marginBottom: 8,
   },
 
   chipContainerServicos: {
@@ -92,18 +92,18 @@ const empresaStyle = StyleSheet.create({
   },
 
   chipActive: {
-    backgroundColor: theme.colors.primary + '15', // leve highlight
-    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.app.primary + '15',
+    borderColor: theme.colors.app.primary,
   },
 
   chipText: {
-    fontSize: theme.fontSize.sm,
+    fontSize: 13,
     color: theme.colors.text.secondary,
     fontWeight: '500',
   },
 
   chipTextActive: {
-    color: theme.colors.primary,
+    color: theme.colors.app.primary,
     fontWeight: '600',
   },
 
@@ -127,7 +127,7 @@ const empresaStyle = StyleSheet.create({
 
   tempoInput: {
     width: 70,
-    height: 44,
+    height: 48,
     borderWidth: 1,
     borderRadius: 8,
     textAlign: 'center',

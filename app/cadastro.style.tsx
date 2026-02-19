@@ -1,6 +1,5 @@
 
 import { StyleSheet } from "react-native";
-import { theme } from "@/components/theme";
 
 const cadastroStyle = StyleSheet.create({
 
@@ -12,7 +11,7 @@ const cadastroStyle = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        padding: theme.spacing.lg,
+        padding: 24,
     },
 
     titulo: {

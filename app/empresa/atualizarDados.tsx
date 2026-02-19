@@ -748,30 +748,33 @@ export default function AtualizarDadosEmpresa() {
                                         {servicos.map(serv => (
 
                                             <View key={serv} style={empresaStyle.tempoInputs}>
-                                                <TextInput
-                                                    keyboardType="numeric"
-                                                    placeholder="Duração (min)"
-                                                    value={
-                                                        servicosValores[serv]?.duracao !== null &&
-                                                            servicosValores[serv]?.duracao !== undefined
-                                                            ? String(servicosValores[serv].duracao)
-                                                            : ''
-                                                    }
-                                                    onChangeText={text => {
-                                                        const duracao = text === '' ? null : Number(text)
-                                                        atualizarServico(serv, servicosValores[serv]?.valor ?? null, duracao, serv === 'Delivery' ? false : true)
-                                                    }}
-                                                    underlineColorAndroid="transparent"
-                                                    style={[
-                                                        empresaStyle.tempoInput,
-                                                        focusedInputHorario === serv && empresaStyle.inputFocused,
-                                                    ]}
-                                                    onFocus={() => setFocusedInputHorario(serv)}
-                                                    onBlur={() => setFocusedInputHorario(null)}
-                                                    maxLength={2}
-                                                />
-
+                                                
                                                 <View style={{ marginBottom: 12 }}>
+                                                    <TextInput
+                                                        keyboardType="numeric"
+                                                        placeholder="Duração (min)"
+                                                        value={
+                                                            servicosValores[serv]?.duracao !== null &&
+                                                                servicosValores[serv]?.duracao !== undefined
+                                                                ? String(servicosValores[serv].duracao)
+                                                                : ''
+                                                        }
+                                                        onChangeText={text => {
+                                                            const duracao = text === '' ? null : Number(text)
+                                                            atualizarServico(serv, servicosValores[serv]?.valor ?? null, duracao, serv === 'Delivery' ? false : true)
+                                                        }}
+                                                        underlineColorAndroid="transparent"
+                                                        style={[
+                                                            empresaStyle.tempoInput,
+                                                            focusedInputHorario === serv && empresaStyle.inputFocused,
+                                                        ]}
+                                                        onFocus={() => setFocusedInputHorario(serv)}
+                                                        onBlur={() => setFocusedInputHorario(null)}
+                                                        maxLength={2}
+                                                    />
+                                                </View>
+
+                                                <View style={{ marginBottom: 12, marginLeft: 12 }}>
                                                     <CurrencyInput
                                                         placeholder={'R$ - ' + serv}
                                                         value={

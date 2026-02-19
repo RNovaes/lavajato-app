@@ -9,7 +9,7 @@ const painelStyle = StyleSheet.create({
     },
 
     container: {
-        padding: theme.spacing.md,
+        padding: 16,
     },
 
     arrow: {
@@ -37,7 +37,7 @@ const painelStyle = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: theme.spacing.lg,
+        marginBottom: 24,
     },
 
     headerLeft: {
@@ -75,17 +75,17 @@ const painelStyle = StyleSheet.create({
         height: 52,
         borderRadius: 26,
         backgroundColor: theme.colors.border,
-        marginRight: theme.spacing.sm,
+        marginRight: 8,
     },
 
     hello: {
-        fontSize: theme.fontSize.lg,
+        fontSize: 18,
         fontWeight: '600',
         color: theme.colors.text.primary,
     },
 
     sub: {
-        fontSize: theme.fontSize.sm,
+        fontSize: 13,
         color: theme.colors.text.secondary,
         marginTop: 2,
     },
@@ -95,22 +95,22 @@ const painelStyle = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#FFF7ED',
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.lg,
-        marginBottom: theme.spacing.lg,
+        padding: 16,
+        borderRadius: 16,
+        marginBottom: 24,
         flexWrap: 'wrap',
         width: '100%'
     },
 
     alertText: {
         flex: 1,
-        fontSize: theme.fontSize.sm,
+        fontSize: 13,
         color: '#92400E',
         width: '80%'
     },
 
     alertLink: {
-        color: theme.colors.primary,
+        color: theme.colors.app.primary,
         fontWeight: '600'
     },
 
@@ -118,15 +118,15 @@ const painelStyle = StyleSheet.create({
     cardsGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: theme.spacing.md,
-        marginBottom: theme.spacing.lg,
+        gap: 16,
+        marginBottom: 24,
     },
 
     card: {
         width: '47%',
         backgroundColor: theme.colors.card,
-        borderRadius: theme.radius.lg,
-        padding: theme.spacing.md,
+        borderRadius: 16,
+        padding: 16,
 
         ...Platform.select({
             ios: {
@@ -142,94 +142,94 @@ const painelStyle = StyleSheet.create({
     },
 
     cardValue: {
-        fontSize: theme.fontSize.xl,
+        fontSize: 22,
         fontWeight: '700',
         color: theme.colors.text.primary,
     },
 
     cardLabel: {
-        fontSize: theme.fontSize.sm,
+        fontSize: 13,
         color: theme.colors.text.secondary,
         marginTop: 4,
     },
 
     /* BOTÃO */
     primaryButton: {
-        backgroundColor: theme.colors.primary,
-        paddingVertical: theme.spacing.md,
-        borderRadius: theme.radius.lg,
+        backgroundColor: theme.colors.app.primary,
+        paddingVertical: 16,
+        borderRadius: 16,
         alignItems: 'center',
-        marginBottom: theme.spacing.lg,
+        marginBottom: 24,
     },
 
     primaryButtonText: {
         color: theme.colors.text.white,
-        fontSize: theme.fontSize.md,
+        fontSize: 16,
         fontWeight: '600',
     },
 
     /* SEÇÃO */
     sectionTitle: {
-        fontSize: theme.fontSize.lg,
+        fontSize: 18,
         fontWeight: '600',
         color: theme.colors.text.primary,
-        marginBottom: theme.spacing.sm,
+        marginBottom: 8,
     },
 
     listItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: theme.spacing.md,
+        paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: theme.colors.border,
     },
 
     listText: {
-        fontSize: theme.fontSize.md,
+        fontSize: 16,
         color: theme.colors.text.primary,
     },
 
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+    // modalOverlay: {
+    //     flex: 1,
+    //     backgroundColor: 'rgba(0,0,0,0.4)',
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    // },
 
-    modalContent: {
-        width: '85%',
-        backgroundColor: '#FFF',
-        borderRadius: 16,
-        padding: 20,
-    },
+    // modalContent: {
+    //     width: '85%',
+    //     backgroundColor: '#FFF',
+    //     borderRadius: 16,
+    //     padding: 20,
+    // },
 
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        marginBottom: 16,
-        textAlign: 'center',
-    },
+    // modalTitle: {
+    //     fontSize: 18,
+    //     fontWeight: '600',
+    //     marginBottom: 16,
+    //     textAlign: 'center',
+    // },
 
-    modalButton: {
-        paddingVertical: 14,
-        borderRadius: 12,
-        backgroundColor: '#F3F4F6',
-        marginBottom: 10,
-    },
+    // modalButton: {
+    //     paddingVertical: 14,
+    //     borderRadius: 12,
+    //     backgroundColor: '#F3F4F6',
+    //     marginBottom: 10,
+    // },
 
-    modalButtonText: {
-        textAlign: 'center',
-        fontSize: 15,
-        fontWeight: '500',
-    },
+    // modalButtonText: {
+    //     textAlign: 'center',
+    //     fontSize: 15,
+    //     fontWeight: '500',
+    // },
 
-    modalCancel: {
-        textAlign: 'center',
-        marginTop: 10,
-        color: '#DC2626',
-        fontWeight: '500',
-    },
+    // modalCancel: {
+    //     textAlign: 'center',
+    //     marginTop: 10,
+    //     color: '#DC2626',
+    //     fontWeight: '500',
+    // },
 
 });
 

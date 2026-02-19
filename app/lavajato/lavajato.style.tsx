@@ -6,10 +6,10 @@ const lavajatoStyle = StyleSheet.create({
 
     // index [id].tsx e // servicos.tsx
 
-    safeArea: {flex: 1, backgroundColor: theme.colors.background},
+    safeArea: { flex: 1, backgroundColor: theme.colors.background },
 
     cardTitle: {
-        fontSize: theme.fontSize.lg,
+        fontSize: 18,
         fontWeight: '600',
         marginBottom: 8,
     },
@@ -36,7 +36,7 @@ const lavajatoStyle = StyleSheet.create({
 
     primaryButtonText: {
         color: theme.colors.text.white,
-        fontSize: theme.fontSize.md,
+        fontSize: 16,
         fontWeight: '600',
     },
 
@@ -53,7 +53,7 @@ const lavajatoStyle = StyleSheet.create({
     },
 
     title: {
-        fontSize: theme.fontSize.xl,
+        fontSize: 22,
         fontWeight: '700',
         color: theme.colors.text.primary,
         marginBottom: 16,
@@ -100,16 +100,28 @@ const lavajatoStyle = StyleSheet.create({
     },
 
     abaServico: { padding: 16, backgroundColor: theme.colors.background },
-    servicoNome: { fontSize: theme.fontSize.md, fontWeight: '600' },
-    lavajatoNome: { color: theme.colors.text.white, fontSize: theme.fontSize.xl, fontWeight: '700' },
+    servicoNome: { fontSize: 16, fontWeight: '600' },
+    lavajatoNome: { color: theme.colors.text.white, fontSize: 22, fontWeight: '700' },
 
     // Agendar.tsx
 
     section: { fontSize: 16, fontWeight: '600', marginVertical: 12 },
-    dia: { width: 56, height: 64, borderRadius: 8, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', marginRight: 8 },
+    dia: { width: 56, height: 64, borderRadius: 8, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', marginRight: 8, borderColor: '#DDD', borderWidth: 1 },
     diaAtivo: { backgroundColor: '#1E88E5' },
-    horarios: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-    hora: { width: '30%', paddingVertical: 14, borderRadius: 10, borderWidth: 1, borderColor: '#DDD', alignItems: 'center' },
+    horarios: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 12,
+        paddingBottom: 8,
+    },
+    hora: {
+        width: '31%',
+        paddingVertical: 14,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#DDD',
+        alignItems: 'center',
+    },
     horaAtiva: { backgroundColor: '#1E88E5', borderColor: '#1E88E5' },
     time: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8, borderWidth: 1, marginRight: 8 },
     timeAtivo: { backgroundColor: '#1E88E5', borderColor: '#1E88E5' },

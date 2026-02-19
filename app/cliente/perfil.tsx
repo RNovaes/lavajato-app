@@ -1,38 +1,56 @@
-import React from 'react';
+import { Header, Padrao } from '@/components/componentes';
+import { theme } from '@/components/theme';
+import { fotoPerfilHeader } from '@/hooks/fotoHeader';
+import { ModalHeaderFoto } from '@/scripts/funcoes';
+import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from './padraoStyle';
+import clienteStyle from './estilos/clientes.style';
+import { useRouter } from 'expo-router';
 
 export default function Perfil() {
+
+    const router = useRouter()
+
+    const { foto, tirarFoto, escolherGaleria } = fotoPerfilHeader()
+    const [modalFotoHeader, setModalFotoHeader] = useState(false)
+
+    function mudarPagina(item: any) {
+        if (item == 'Meus Dados'){
+            router.push('/cliente/meusDados')
+        }
+    }
+
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <ScrollView style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.hello}>Meu perfil</Text>
-                    <Text style={styles.sub}>Gerencie sua conta</Text>
-                </View>
 
+        <Padrao>
 
-                <View style={styles.section}>
-                    {['Meus dados', 'Minhas avaliações', 'Configurações'].map((item, index) => (
-                        <TouchableOpacity key={index} style={styles.listItem}>
-                            <Text style={styles.listText}>{item}</Text>
-                            <Text style={styles.arrow}>›</Text>
+            <Header title='Meu Perfil' subtitle='Gerencie sua conta' foto={foto} onPress={() => setModalFotoHeader(true)}></Header>
+
+            <ModalHeaderFoto visible={modalFotoHeader} onClose={() => setModalFotoHeader(false)} onTirarFoto={async () => {
+                await tirarFoto()
+                setModalFotoHeader(false)
+            }}
+                onEscolherGaleria={async () => {
+                    await escolherGaleria()
+                    setModalFotoHeader(false)
+                }}>
+            </ModalHeaderFoto>
+
+            <ScrollView removeClippedSubviews={false} keyboardShouldPersistTaps="always"
+                showsVerticalScrollIndicator={false}>
+
+                <View style={theme.card.section}>
+                    {['Meus Dados', 'Minhas Avaliações', 'Configurações', 'Remover Conta', 'Sair da Conta'].map((item, index) => (
+                        <TouchableOpacity key={index} style={clienteStyle.listItem} onPress={() => mudarPagina(item)}>
+                            <Text style={clienteStyle.listText}>{item}</Text>
+                            <Text style={clienteStyle.arrow}>›</Text>
                         </TouchableOpacity>
                     ))}
                 </View>
 
-
-                <View style={styles.accountSection}>
-                    <TouchableOpacity>
-                        <Text style={styles.logout}>Sair da conta</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                        <Text style={styles.delete}>Remover conta</Text>
-                    </TouchableOpacity>
-                </View>
             </ScrollView>
-        </SafeAreaView>
+
+        </Padrao>
     );
 }
 

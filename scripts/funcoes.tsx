@@ -1,4 +1,7 @@
 
+import { theme } from '@/components/theme';
+import { Modal, View, Text, TouchableOpacity } from 'react-native'
+
 export function fmTime(valor: Date) {
 
     if (!valor) return "";
@@ -197,4 +200,48 @@ export function validarTelefone(telefone: string) {
     if (valor.length === 11 && valor.charAt(2) !== '9') return false;
 
     return true;
+}
+
+type ModalBaseProps = {
+    visible: boolean
+    onClose: () => void
+    onTirarFoto: () => void
+    onEscolherGaleria: () => void
+}
+
+export function ModalHeaderFoto({ visible, onClose, onTirarFoto, onEscolherGaleria }: ModalBaseProps) {
+
+    return (
+
+        <Modal
+            visible={visible}
+            transparent
+            animationType="fade"
+            onRequestClose={onClose}
+        >
+            <View style={theme.modal.modalOverlay}>
+                <View style={theme.modal.modalContent}>
+                    <Text style={theme.modal.modalTitle}>Alterar foto</Text>
+
+                    <TouchableOpacity
+                        style={theme.modal.modalButton}
+                        onPress={onTirarFoto}
+                    >
+                        <Text style={theme.modal.modalButtonText}>Tirar foto</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={theme.modal.modalButton}
+                        onPress={onEscolherGaleria}
+                    >
+                        <Text style={theme.modal.modalButtonText}>Escolher da galeria</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={onClose}>
+                        <Text style={theme.modal.modalCancel}>Cancelar</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </Modal>
+    )
 }

@@ -5,6 +5,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { theme } from '@/components/theme';
 
 export default function TabLayoutEmpresa() {
 
@@ -22,7 +23,7 @@ export default function TabLayoutEmpresa() {
           tabBarStyle: {
             backgroundColor: '#FFFFFF',
             borderTopWidth: 0.5,
-            borderTopColor: '#E5E7EB',
+            borderTopColor: theme.colors.app.primary,
             height: 60 + insets.bottom,
             paddingBottom: insets.bottom,
           },
@@ -62,7 +63,6 @@ export default function TabLayoutEmpresa() {
           }}
         />
 
-
         <Tabs.Screen
           name="perfil"
           options={{
@@ -70,6 +70,34 @@ export default function TabLayoutEmpresa() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="person-outline" size={size} color={color} />
             ),
+          }}
+        />
+
+        <Tabs.Screen
+          name="meusDados"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="estilos/clientes.style"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="estilos/buscar.style"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="estilos/meusDados.style"
+          options={{
+            href: null,
           }}
         />
 

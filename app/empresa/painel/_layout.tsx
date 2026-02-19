@@ -52,6 +52,18 @@ export default function TabLayoutEmpresa() {
             href: null,
           }}
         />
+        <Tabs.Screen
+          name="estilos/agendamentos.Style"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="agendamentos"
+          options={{
+            href: null,
+          }}
+        />
       </Tabs>
       <StatusBar style="auto" />
     </ThemeProvider>

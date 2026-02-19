@@ -2,11 +2,7 @@
 import { StyleSheet } from 'react-native';
 import { theme } from '@/components/theme';
 
-const perfilStyle = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
+const meusDadosStyle = StyleSheet.create({
 
   container: {
     padding: 16,
@@ -115,4 +111,4 @@ const perfilStyle = StyleSheet.create({
     },
 });
 
-export default perfilStyle;
+export default meusDadosStyle;

@@ -1,25 +1,68 @@
 
 import atualizarStyle from '@/app/empresa/empresa.style';
 import { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { IconButton, Modal, Portal } from 'react-native-paper';
 import { theme } from './theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
-// const CARD = '#F9FAFB';
 const PRIMARY = '#2563EB';
+
+export function Padrao({ children }: any) {
+
+    return (
+
+        <SafeAreaView style={theme.pagina.safeArea} edges={['top']}>
+            {children}
+        </SafeAreaView>
+    )
+
+}
+
+export function Header({ title, subtitle, onPress, foto }: any) {
+    return (
+        <View style={theme.header.header}>
+            <TouchableOpacity onPress={onPress}>
+                <View style={theme.header.avatarWrapper}>
+                    <Image source={foto} style={theme.header.avatar} />
+                    <View style={theme.header.cameraIcon}>
+                        <Ionicons name="camera" size={12} color="#FFF" />
+                    </View>
+                </View>
+            </TouchableOpacity>
+            <View style={theme.header.headerRight}>
+                <Text style={theme.header.title}>{title}</Text>
+                <Text style={theme.header.sub}>{subtitle}</Text>
+            </View>
+        </View>
+    );
+}
 
 export function Card({ title, children }: any) {
     return (
-        <View style={{ backgroundColor: theme.colors.card, borderRadius: 12, padding: 16, marginTop: 16 }}>
-            <Text style={{ fontWeight: '600', marginBottom: 12 }}>{title}</Text>
-            {children}
+        <View style={theme.card.section}>
+            <View style={theme.card.summaryCard}>
+                <Text style={theme.card.title}>{title}</Text>
+                {children}
+            </View>
+        </View>
+    );
+}
+
+export function CardUnicas({ children }: any) {
+    return (
+        <View style={theme.cardUnicas.section}>
+            <View style={theme.cardUnicas.subSection}>
+                {children}
+            </View>
         </View>
     );
 }
 
 export function CardInfo({ title, children }: any) {
     return (
-        <View style={{ backgroundColor: theme.colors.card, borderRadius: 12, padding: 16, marginTop: 16, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
+        <View style={{ backgroundColor: '#f5f5f5', borderRadius: 12, padding: 16, marginTop: 16, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
             <Text style={{ fontWeight: '600', marginBottom: 12 }}>{title}</Text>
             {children}
         </View>
@@ -73,7 +116,7 @@ export function ChipCust({ label, active, onPress }: any) {
     )
 }
 
-export function Infos({texto}: any) {
+export function Infos({ texto }: any) {
     const [visible, setVisible] = useState(false);
     return (
         <>

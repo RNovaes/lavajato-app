@@ -1,102 +1,155 @@
 
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import homeClientes from '../cliente/index.style'
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import MeuTextInput from '@/components/MeuTextInput';
-import { PrimaryButton, SecondaryButton } from '@/components/componentes';
+import { Card, Header, Padrao, PrimaryButton, SecondaryButton } from '@/components/componentes';
+import { theme } from '@/components/theme';
+import { fotoPerfilHeader } from '@/hooks/fotoHeader';
+import { ModalHeaderFoto } from '@/scripts/funcoes';
 import { mascaraPlaca } from '@/scripts/mascaras';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import clienteStyle from './estilos/clientes.style';
 
 export default function Inicio() {
 
   const router = useRouter()
 
+  // Foto Header
+  const { foto, tirarFoto, escolherGaleria } = fotoPerfilHeader()
+  const [modalFotoHeader, setModalFotoHeader] = useState(false)
+
+  // Modal de cadastro de veículos
   const [visivel, setVisivel] = useState(false);
+  const [carro, setCarro] = useState('');
+  const [placa, setPlaca] = useState('');
 
   function cadastrarVeiculo() {
     console.log('Cadastrando Veículo....')
+    setVisivel(false)
   }
 
-  const [carro, setCarro] = useState();
-  const [placa, setPlaca] = useState('');
-
-  const ultimoAgendamento = {
-    local: 'Lava Jato Central',
+  // Dados Mock
+  const resumo = {
+    ultimoLavaJato: 'Lava Jato Central',
+    totalGasto: 'R$ 320,00',
+    totalServicos: 6,
     data: '12/12/2025',
     status: 'Concluído',
   };
 
-  const resumo = {
-    ultimoLavaJato: ultimoAgendamento.local,
-    totalGasto: 'R$ 320,00',
-    totalServicos: 6,
+  type LavaJato = {
+    id: string;
+    nome: string;
+    endereco: string;
+    data: string;
+    distancia: number;
+    imagem: string;
   };
 
+  const dadosMock: LavaJato[] = [
+    {
+      id: "1",
+      nome: "Lava Jato Central",
+      endereco: "Centro",
+      data: "15/12/2025",
+      distancia: 1.2,
+      imagem: "https://picsum.photos/200",
+    },
+    {
+      id: "2",
+      nome: "Brilho Car",
+      endereco: "Zona Sul",
+      data: "20/02/2025",
+      distancia: 2.5,
+      imagem: "https://picsum.photos/201",
+    },
+    {
+      id: "3",
+      nome: "Auto Clean",
+      endereco: "Zona Norte",
+      data: "15/03/2025",
+      distancia: 5.0,
+      imagem: "https://picsum.photos/202",
+    },
+  ];
+
   return (
-    <SafeAreaView style={homeClientes.safeArea} edges={['top']}>
-      <ScrollView style={homeClientes.container}>
-        <View style={homeClientes.header}>
-          <Text style={homeClientes.hello}>Olá, Renato 👋</Text>
-          <Text style={homeClientes.sub}>O que vamos lavar hoje?</Text>
-        </View>
 
+    <Padrao>
 
-        {/* Resumo */}
-        <View style={homeClientes.section}>
-          <View style={homeClientes.summaryCard}>
-            <Text style={homeClientes.sectionTitle}>Resumo</Text>
-            <View style={homeClientes.summaryRow}>
-              <View>
-                <Text style={homeClientes.cardLabel}>Último lava-jato</Text>
-                <Text style={homeClientes.cardValue}>{resumo.ultimoLavaJato || '-'}</Text>
-              </View>
-              <View style={homeClientes.summaryDivider} />
-              <View>
-                <Text style={homeClientes.cardLabel}>Total gasto</Text>
-                <Text style={homeClientes.cardValue}>{resumo.totalGasto || 'R$ 0,00'}</Text>
-              </View>
-              <View style={homeClientes.summaryDivider} />
-              <View>
-                <Text style={homeClientes.cardLabel}>Serviços</Text>
-                <Text style={homeClientes.cardValue}>{resumo.totalServicos || 0}</Text>
-              </View>
+      <Header title='Olá, Renato 👋' subtitle='O que vamos lavar hoje?' foto={foto} onPress={() => setModalFotoHeader(true)}></Header>
+
+      <ModalHeaderFoto visible={modalFotoHeader} onClose={() => setModalFotoHeader(false)} onTirarFoto={async () => {
+        await tirarFoto()
+        setModalFotoHeader(false)
+      }}
+        onEscolherGaleria={async () => {
+          await escolherGaleria()
+          setModalFotoHeader(false)
+        }}>
+      </ModalHeaderFoto>
+
+      <ScrollView removeClippedSubviews={false} keyboardShouldPersistTaps="always"
+        showsVerticalScrollIndicator={false}>
+
+        <Card title='Resumo'>
+          <View style={clienteStyle.summaryRow}>
+            <View>
+              <Text style={clienteStyle.cardLabel}>Último lava-jato</Text>
+              <Text style={clienteStyle.cardValue}>{resumo.ultimoLavaJato || '-'}</Text>
+            </View>
+            <View style={clienteStyle.summaryDivider} />
+            <View>
+              <Text style={clienteStyle.cardLabel}>Total gasto</Text>
+              <Text style={clienteStyle.cardValue}>{resumo.totalGasto || 'R$ 0,00'}</Text>
+            </View>
+            <View style={clienteStyle.summaryDivider} />
+            <View>
+              <Text style={clienteStyle.cardLabel}>Serviços</Text>
+              <Text style={clienteStyle.cardValue}>{resumo.totalServicos || 0}</Text>
+            </View>
+            <View>
+              <Text style={clienteStyle.cardLabel}>Data</Text>
+              <Text style={clienteStyle.cardValue}>{resumo.data || '-'}</Text>
+            </View>
+            <View>
+              <Text style={clienteStyle.cardLabel}>Status</Text>
+              <Text style={clienteStyle.cardValue}>{resumo.status || '-'}</Text>
             </View>
           </View>
-        </View>
+        </Card>
 
-
-        {/* MAPA */}
-        <TouchableOpacity style={homeClientes.primaryButton} activeOpacity={0.8} onPress={() => router.push('../mapa')}>
+        {/* <TouchableOpacity style={theme.botoes.principal} activeOpacity={0.8} onPress={() => router.push('../mapa')}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View>
-              <Ionicons name="map-outline" size={30} color={'white'} style={{marginRight: 10}}/>
+              <Ionicons name="map-outline" size={30} color={'white'} style={{ marginRight: 10 }} />
             </View>
             <View>
-              <Text style={homeClientes.primaryButtonText}>Buscar Lava-Jato</Text>
-              <Text style={homeClientes.primaryButtonSub}>Selecionar no Mapa</Text>
+              <Text style={clienteStyle.primaryButtonText}>Buscar Lava-Jato</Text>
+              <Text style={clienteStyle.primaryButtonSub}>Selecionar no Mapa</Text>
             </View>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
-        <View style={homeClientes.section}>
-          <Text style={homeClientes.sectionTitle}>Meus Carros</Text>
+        <Card title='Meus Carros'>
           {carro && (
-            <View style={homeClientes.card}>
-              <Text style={homeClientes.cardValue}>Cruze</Text>
-              <Text style={homeClientes.cardLabel}>
-                LLT-7003
+            <View>
+              <Text style={clienteStyle.cardValue}>{carro}</Text>
+              <Text style={clienteStyle.cardLabel}>
+                {placa}
               </Text>
             </View>
-          )}{<Text>Não há carros cadastrados</Text>}
-        </View>
-        <TouchableOpacity style={homeClientes.primaryButton} activeOpacity={0.8} onPress={() => setVisivel(true)}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="add-circle-outline" size={30} color={'white'} style={{ marginRight: 10 }} />
-            <Text style={homeClientes.primaryButtonText}>Adicionar Veículo</Text>
-          </View>
-        </TouchableOpacity>
+          )}{!carro && (
+            <Text>Não há carros cadastrados</Text>
+          )}
+          <TouchableOpacity style={theme.botoes.principal} activeOpacity={0.8} onPress={() => setVisivel(true)}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="add-circle-outline" size={30} color={'white'} style={{ marginRight: 10 }} />
+              <Text style={theme.botoes.primaryButtonText}>Adicionar Veículo</Text>
+            </View>
+          </TouchableOpacity>
+        </Card>
 
         <Modal
           visible={visivel}
@@ -104,14 +157,14 @@ export default function Inicio() {
           animationType="fade"
           onRequestClose={() => setVisivel(false)}
         >
-          <View style={homeClientes.overlay}>
-            <View style={homeClientes.popup}>
-              <Text style={homeClientes.tituloModal}>Dados do Veículo</Text>
+          <View style={clienteStyle.overlay}>
+            <View style={clienteStyle.popup}>
+              <Text style={clienteStyle.tituloModal}>Dados do Veículo</Text>
 
-              <Text style={homeClientes.textosModal}>Modelo</Text>
-              <MeuTextInput />
+              <Text style={clienteStyle.textosModal}>Modelo</Text>
+              <MeuTextInput onChangeText={text => setCarro(text)} maxLength={15} />
 
-              <Text style={homeClientes.textosModal}>Placa</Text>
+              <Text style={clienteStyle.textosModal}>Placa</Text>
               <MeuTextInput value={placa}
                 onChangeText={text => setPlaca(mascaraPlaca(text))}
                 placeholder="ABC1D23 ou ABC-1234"
@@ -125,31 +178,26 @@ export default function Inicio() {
           </View>
         </Modal>
 
-        {/* Último agendamento */}
-        <View style={homeClientes.section}>
-          <Text style={homeClientes.sectionTitle}>Último agendamento</Text>
-          <View style={homeClientes.card}>
-            <Text style={homeClientes.cardValue}>{ultimoAgendamento.local || '-'}</Text>
-            <Text style={homeClientes.cardLabel}>
-              {ultimoAgendamento.data || '-'} • {ultimoAgendamento.status || '-'}
-            </Text>
-          </View>
-        </View>
+        <Card title='Sugestões Próximas'>
+          {dadosMock.map((item, index) => (
 
+            <TouchableOpacity key={index} style={theme.cardUnicas.section}>
+              <Image source={{ uri: item.imagem }} style={theme.cardUnicas.imagem} />
 
-        {/* Sugestões */}
-        <View style={homeClientes.section}>
-          <Text style={homeClientes.sectionTitle}>Sugestões próximas</Text>
+              <View style={theme.cardUnicas.info}>
+                <Text style={theme.cardUnicas.nome}>{item.nome}</Text>
+                <Text style={theme.cardUnicas.endereco}>{item.endereco}</Text>
+              </View>
 
+              <View style={theme.cardUnicas.distanciaBox}>
+                <Text style={theme.cardUnicas.distancia}>{item.distancia.toFixed(1)} km</Text>
+              </View>
+            </TouchableOpacity>
 
-          {['Lava Jato Central', 'Lava Jato Brilho Rápido'].map((item, index) => (
-            <View key={index} style={homeClientes.card}>
-              <Text style={homeClientes.cardValue}>{item}</Text>
-              <Text style={homeClientes.cardLabel}>Aprox. 1.2km</Text>
-            </View>
           ))}
-        </View>
+        </Card>
+
       </ScrollView>
-    </SafeAreaView>
+    </Padrao>
   )
 }

@@ -1,13 +1,16 @@
 
-import { theme } from '@/components/theme'
 import dayjs from 'dayjs'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, Dimensions, ImageBackground, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import lavajatoStyle from './lavajato.style'
+import { valorParaReal } from '@/scripts/funcoes'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function agendar() {
+
+  const insets = useSafeAreaInsets()
 
   // DADOS VINDO DA PAGINA SERVICOS
 
@@ -19,7 +22,7 @@ export default function agendar() {
     ? JSON.parse(servicos)
     : [];
 
-  console.log(listaServicos);
+  // console.log(listaServicos);
 
   // DADOS MOCK LAVAJATO E AGENDA ===========================================================
 
@@ -37,35 +40,35 @@ export default function agendar() {
   const [agendamentos, setAgendamentos] = useState([
     {
       id: '1',
-      data: '2026-01-16',
+      data: '2026-01-24',
       inicio: '09:00',
       duracao: 60,
       time: 'A',
     },
     {
       id: '2',
-      data: '2026-01-16',
+      data: '2026-01-23',
       inicio: '10:00',
       duracao: 90,
       time: 'B',
     },
     {
       id: '3',
-      data: '2026-01-16',
+      data: '2026-01-23',
       inicio: '14:00',
       duracao: 60,
       time: 'A',
     },
     {
       id: '4',
-      data: '2026-01-17',
-      inicio: '14:30',
+      data: '2026-01-24',
+      inicio: '16:30',
       duracao: 90,
       time: 'A',
     },
     {
       id: '5',
-      data: '2026-01-17',
+      data: '2026-01-23',
       inicio: '16:00',
       duracao: 60,
       time: 'B',
@@ -242,28 +245,53 @@ export default function agendar() {
 
       <ImageBackground source={lavaJato.imagemUrl} style={{ height: Dimensions.get('window').height * 0.3 }} />
 
-      <Animated.View style={{ flex: 1, padding: 16, opacity: fade }}>
+      <Animated.ScrollView
+        style={{ flex: 1, opacity: fade }}
+        contentContainerStyle={{
+          padding: 16,
+          paddingBottom: insets.bottom + 24,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={lavajatoStyle.title}>Agendamento</Text>
 
+        <Text style={{fontSize: 16, fontWeight: '600'}}>Serviços</Text>
+        <View style={lavajatoStyle.card}>
+
+          {listaServicos.map((servico: any) => (
+            <View
+              key={servico.id}
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+            >
+              <Text>{servico.nome}</Text>
+              <Text>{servico.duracao} min</Text>
+              <Text>{valorParaReal(servico.valor)}</Text>
+            </View>
+          ))}
+        </View>
+
         {lavaJato.capacidade > 1 && (
-          <View style={{ flexDirection: 'row', marginBottom: 16 }}>
-            {times.map(t => (
-              <TouchableOpacity
-                key={t}
-                onPress={() => {
-                  setTimeSelecionado(t)
-                  setHorarioSelecionado(null)
-                }}
-                style={[
-                  lavajatoStyle.time,
-                  t === timeSelecionado && lavajatoStyle.timeAtivo,
-                ]}
-              >
-                <Text style={{ color: t === timeSelecionado ? '#FFF' : '#000' }}>
-                  Time {t}
-                </Text>
-              </TouchableOpacity>
-            ))}
+          <View>
+            <Text style={lavajatoStyle.section}>Times</Text>
+            <View style={{ flexDirection: 'row', marginBottom: 16 }}>
+              {times.map(t => (
+                <TouchableOpacity
+                  key={t}
+                  onPress={() => {
+                    setTimeSelecionado(t)
+                    setHorarioSelecionado(null)
+                  }}
+                  style={[
+                    lavajatoStyle.time,
+                    t === timeSelecionado && lavajatoStyle.timeAtivo,
+                  ]}
+                >
+                  <Text style={{ color: t === timeSelecionado ? '#FFF' : '#000' }}>
+                    Time {t}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         )}
 
@@ -291,29 +319,32 @@ export default function agendar() {
         </ScrollView>
 
         <Text style={lavajatoStyle.section}>Horários disponíveis</Text>
-        <View style={{ minHeight: 160 }}>
-          <View style={lavajatoStyle.horarios}>
-            {horariosDisponiveis.map(h => (
-              <TouchableOpacity
-                key={h}
-                onPress={() => setHorarioSelecionado(h)}
-                style={[
-                  lavajatoStyle.hora,
-                  h === horarioSelecionado && lavajatoStyle.horaAtiva,
-                ]}
+        <ScrollView
+          style={{ maxHeight: 260 }}
+          contentContainerStyle={lavajatoStyle.horarios}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+        >
+          {horariosDisponiveis.map(h => (
+            <TouchableOpacity
+              key={h}
+              onPress={() => setHorarioSelecionado(h)}
+              style={[
+                lavajatoStyle.hora,
+                h === horarioSelecionado && lavajatoStyle.horaAtiva,
+              ]}
+            >
+              <Text
+                style={{
+                  color: h === horarioSelecionado ? '#FFF' : '#000',
+                  fontWeight: h === horarioSelecionado ? '700' : '400',
+                }}
               >
-                <Text
-                  style={{
-                    color: h === horarioSelecionado ? '#FFF' : '#000',
-                    fontWeight: h === horarioSelecionado ? '700' : '400',
-                  }}
-                >
-                  {h}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+                {h}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
         <TouchableOpacity
           disabled={!horarioSelecionado}
@@ -322,7 +353,7 @@ export default function agendar() {
         >
           <Text style={{ color: '#FFF', fontWeight: '700' }}>Confirmar Agendamento</Text>
         </TouchableOpacity>
-      </Animated.View>
+      </Animated.ScrollView>
     </SafeAreaView>
   )
 }
